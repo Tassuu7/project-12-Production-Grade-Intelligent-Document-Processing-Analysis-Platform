@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Admin - All Documents{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Global Document Explorer</h1>
+        <p class="page-subtitle">System-wide documents uploaded across all user accounts.</p>
+    </div>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Owner</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Latency</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                <tr>
+                    <td>{{ doc.id }}</td>
+                    <td>{{ doc.owner.username }}</td>
+                    <td><strong><a href="/documents/{{ doc.id }}">{{ doc.title }}</a></strong></td>
+                    <td>{{ doc.file_type | upper }}</td>
+                    <td>{{ doc.analysis_result.category_predicted if doc.analysis_result else '-' }}</td>
+                    <td><span class="badge badge-{{ doc.status }}">{{ doc.status }}</span></td>
+                    <td>{{ doc.processing_duration_ms | round(1) }} ms</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Documents{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Document Upload Studio</h1>
+        <p class="page-subtitle">Upload multiple PDF, DOCX, TXT, CSV, and XLSX documents for instant local ML analysis.</p>
+    </div>
+</div>
+
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <div class="dropzone" id="main-dropzone" style="padding: 4rem 2rem;">
+        <svg class="dropzone-icon" viewBox="0 0 24 24" style="width: 72px; height: 72px;"><use href="/static/icons/icons.svg#icon-upload"></use></svg>
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--slate-900);">Drop documents here or click to browse</h3>
+        <p style="color: var(--slate-500); font-size: 0.9rem; margin-top: 0.5rem;">
+            Supports PDF, DOCX, TXT, CSV, and XLSX files up to 50 MB each.
+        </p>
+        <input type="file" id="main-file-input" multiple style="display: none;">
+    </div>
+
+    <div id="main-file-list" style="margin-top: 1.5rem;"></div>
+
+    <button id="main-upload-btn" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.85rem;" disabled>
+        Process & Analyze Selected Documents
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/uploader.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    initUploader('main-dropzone', 'main-file-input', 'main-file-list', 'main-upload-btn');
+});
+</script>
+{% endblock %}

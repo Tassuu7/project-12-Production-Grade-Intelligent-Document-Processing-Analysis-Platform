@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Admin - Audit Logs{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">System Security & Activity Audit Log</h1>
+        <p class="page-subtitle">Immutable chronological record of logins, uploads, deletions, and administrative actions.</p>
+    </div>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                    <th>User</th>
+                    <th>Resource</th>
+                    <th>IP Address</th>
+                    <th>Severity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.id }}</td>
+                    <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td><strong>{{ log.action }}</strong></td>
+                    <td>{{ log.user.username if log.user else 'Anonymous' }}</td>
+                    <td>{{ log.resource_type }} ({{ log.resource_id }})</td>
+                    <td>{{ log.ip_address or '-' }}</td>
+                    <td><span class="badge badge-completed">{{ log.severity }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

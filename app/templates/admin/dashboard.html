@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Overview{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">System Administration Command Center</h1>
+        <p class="page-subtitle">Global telemetry, user directory, background queue health, and security audit logs.</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; stroke: currentColor;"><use href="/static/icons/icons.svg#icon-document"></use></svg>
+        </div>
+        <div>
+            <div class="stat-val">{{ admin_stats.total_users }}</div>
+            <div class="stat-label">Registered Users</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; stroke: currentColor;"><use href="/static/icons/icons.svg#icon-check"></use></svg>
+        </div>
+        <div>
+            <div class="stat-val">{{ admin_stats.total_documents }}</div>
+            <div class="stat-label">Total Documents</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow">
+            <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; stroke: currentColor;"><use href="/static/icons/icons.svg#icon-chart"></use></svg>
+        </div>
+        <div>
+            <div class="stat-val">{{ admin_stats.active_jobs }}</div>
+            <div class="stat-label">Queue Depth</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <div style="font-size: 1.5rem; font-weight: 800;">{{ admin_stats.success_rate }}%</div>
+            <div class="stat-label">Processing Success</div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-columns">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Recent System Audit Feed</h2>
+            <a href="/admin/audit-logs" class="btn btn-sm btn-secondary">Full Audit Log</a>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>User</th>
+                        <th>Severity</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in recent_logs %}
+                    <tr>
+                        <td><strong>{{ log.action }}</strong></td>
+                        <td>{{ log.user.username if log.user else 'System' }}</td>
+                        <td><span class="badge badge-completed">{{ log.severity }}</span></td>
+                        <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">System Health & Telemetry</h2>
+            <a href="/admin/health" class="btn btn-sm btn-secondary">Detailed</a>
+        </div>
+        <div style="font-size: 0.9rem; line-height: 2;">
+            <div><strong>Database Status:</strong> <span style="color: var(--success-700);">HEALTHY (SQLite WAL)</span></div>
+            <div><strong>Worker Thread Pool:</strong> <span style="color: var(--success-700);">ACTIVE (4 Threads)</span></div>
+            <div><strong>App Version:</strong> 1.0.0 Enterprise</div>
+            <div><strong>Uptime:</strong> Operational</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

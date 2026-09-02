@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Admin - System Health{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">System Health & Configuration</h1>
+        <p class="page-subtitle">Real-time system diagnostics, resource telemetry, and application parameters.</p>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 1.5rem;">
+    <div class="card-header"><h3 class="card-title">Live System Status</h3></div>
+    <div style="font-size: 0.95rem; line-height: 2;">
+        <div><strong>Application Status:</strong> <span style="color: var(--success-700); font-weight: 700;">ONLINE</span></div>
+        <div><strong>Database Vitality:</strong> CONNECTED (SQLite WAL mode)</div>
+        <div><strong>Worker Threads:</strong> 4 Threads Running</div>
+        <div><strong>Max Upload Limit:</strong> 50 MB</div>
+    </div>
+</div>
+{% endblock %}
