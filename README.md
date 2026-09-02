@@ -11,16 +11,14 @@ An enterprise-grade, human-engineered Intelligent Document Processing (IDP) and 
 
 ---
 
-## 🔀 Pull Requests & Git Branches
+## 🔀 Active GitHub Pull Requests & Branches
 
-This repository features structured modular branches and 4 merged feature Pull Requests on `main`:
-
-| PR # | Branch | Title | Status |
-| :--- | :--- | :--- | :--- |
-| **PR #1** | [`feature/core-engine`](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/tree/feature/core-engine) | **Core Extraction Engine**: Multi-format pure-Python parsers for PDF, DOCX, TXT, CSV, and XLSX files | `MERGED` |
-| **PR #2** | [`feature/ml-nlp-pipeline`](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/tree/feature/ml-nlp-pipeline) | **Mathematical NLP Pipeline**: TF-IDF Naive Bayes hybrid classifier, TextRank summarization, and deep Resume / Candidate Intelligence | `MERGED` |
-| **PR #3** | [`feature/dashboards-and-ui`](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/tree/feature/dashboards-and-ui) | **UI & Responsive Dashboards**: Warm flame orange & crimson design system, dynamic category distribution charts, and live Job Description Matcher | `MERGED` |
-| **PR #4** | [`feature/admin-audit-reports`](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/tree/feature/admin-audit-reports) | **RBAC & Admin Command Center**: Global Search Studio, user directory, real background job queue monitor, and immutable audit logs | `MERGED` |
+| PR # | Branch | Title | Status | Link |
+| :---: | :--- | :--- | :---: | :--- |
+| **#1** | `feature/core-engine` | **Core Extraction Engine**: Multi-format pure-Python parsers for PDF, DOCX, TXT, CSV, and XLSX files | `OPEN` | [View PR #1](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/pull/1) |
+| **#2** | `feature/ml-nlp-pipeline` | **Mathematical NLP Pipeline**: TF-IDF Naive Bayes hybrid classifier, TextRank summarization, and Resume Intelligence | `OPEN` | [View PR #2](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/pull/2) |
+| **#3** | `feature/dashboards-and-ui` | **UI & Responsive Dashboards**: Flame orange & crimson design system, dynamic category distribution charts, and live Job Matcher | `OPEN` | [View PR #3](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/pull/3) |
+| **#4** | `feature/admin-audit-reports` | **RBAC & Admin Command Center**: Global Search Studio, user directory, real background job queue monitor, and immutable audit logs | `OPEN` | [View PR #4](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/pull/4) |
 
 ---
 
