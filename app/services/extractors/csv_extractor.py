@@ -23,10 +23,8 @@ class CSVDocumentExtractor(BaseDocumentExtractor):
             with open(filepath, "rb") as f:
                 raw = f.read()
             
-            # Decode content
             text, enc = self._decode_content(raw)
             
-            # Detect dialect / delimiter
             sample = text[:4096]
             try:
                 dialect = csv.Sniffer().sniff(sample)
@@ -43,22 +41,18 @@ class CSVDocumentExtractor(BaseDocumentExtractor):
             headers = rows[0]
             data_rows = rows[1:] if len(rows) > 1 else []
             
-            # Generate text representation for NLP downstream processing
             text_lines: List[str] = [f"CSV Table with Columns: {', '.join(headers)}"]
             for idx, r in enumerate(data_rows[:100], start=1):
                 row_str = " | ".join([f"{h}: {v}" for h, v in zip(headers, r) if v.strip()])
                 text_lines.append(f"Row {idx}: {row_str}")
             
-            full_text = "
-".join(text_lines)
-            
-            # Profile statistics
+            full_text = "\n".join(text_lines)
             stats = self._calculate_column_stats(headers, data_rows)
             
             table = TableData(
                 table_index=1,
                 headers=headers,
-                rows=data_rows[:200],  # cap table display matrix at 200 rows
+                rows=data_rows[:200],
                 row_count=len(data_rows),
                 column_count=len(headers),
                 sheet_name="Main CSV Data"
@@ -119,7 +113,6 @@ class CSVDocumentExtractor(BaseDocumentExtractor):
                 else:
                     total_missing += 1
             
-            # Check if numerical
             numeric_vals = []
             for v in col_values:
                 try:

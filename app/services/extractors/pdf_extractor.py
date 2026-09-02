@@ -28,18 +28,14 @@ class PDFDocumentExtractor(BaseDocumentExtractor):
             if not data.startswith(b"%PDF-"):
                 raise ExtractionFailedException(filepath, "Invalid PDF header signature")
             
-            # Extract PDF version
             version_match = re.search(rb"%PDF-(\d+\.\d+)", data[:20])
             pdf_version = version_match.group(1).decode("ascii") if version_match else "1.4"
             
-            # Extract decompressed text streams and objects
             pages_text = self._extract_page_texts(data)
             if not pages_text:
-                # Fallback: regex search on raw strings
                 raw_strings = self._fallback_raw_text_extraction(data)
                 pages_text = [raw_strings] if raw_strings else [""]
             
-            # Detect tables from text layout
             tables = self._detect_text_tables(pages_text)
             
             pages: List[PageContent] = []
@@ -69,9 +65,7 @@ class PDFDocumentExtractor(BaseDocumentExtractor):
                     tables=page_tables
                 ))
             
-            full_text = "
-
-".join(full_text_list).strip()
+            full_text = "\n\n".join(full_text_list).strip()
             headings = self._extract_headings(full_text)
             
             return ExtractionResult(
@@ -92,22 +86,14 @@ class PDFDocumentExtractor(BaseDocumentExtractor):
             raise ExtractionFailedException(filepath, str(e))
 
     def _extract_page_texts(self, data: bytes) -> List[str]:
-        """Find and decompress all FlateDecode streams in PDF objects."""
         page_texts: List[str] = []
-        
-        # Regex to locate stream ... endstream blocks
-        stream_pattern = re.compile(rb"stream[
-]+(.*?)[
-]+endstream", re.DOTALL)
+        stream_pattern = re.compile(b"stream[\r\n]+(.*?)[\r\n]+endstream", re.DOTALL)
         for match in stream_pattern.finditer(data):
             stream_data = match.group(1)
             decompressed: Optional[bytes] = None
-            
-            # Try raw zlib decompression
             try:
                 decompressed = zlib.decompress(stream_data)
             except Exception:
-                # Try raw deflate without header
                 try:
                     decompressed = zlib.decompress(stream_data, -zlib.MAX_WBITS)
                 except Exception:
@@ -121,10 +107,7 @@ class PDFDocumentExtractor(BaseDocumentExtractor):
         return page_texts
 
     def _parse_pdf_operators(self, stream: bytes) -> str:
-        """Parse standard PDF text operators: Tj, TJ, ', ", BT/ET blocks."""
         text_chunks: List[str] = []
-        
-        # Extract text in parentheses before Tj or '
         tj_matches = re.findall(rb"\((.*?)\)\s*Tj", stream)
         for chunk in tj_matches:
             try:
@@ -133,7 +116,6 @@ class PDFDocumentExtractor(BaseDocumentExtractor):
             except Exception:
                 pass
         
-        # Extract array elements in TJ operators: [(Hello) -10 (World)] TJ
         tj_array_matches = re.findall(rb"\[(.*?)\]\s*TJ", stream, re.DOTALL)
         for arr in tj_array_matches:
             elements = re.findall(rb"\((.*?)\)", arr)
@@ -144,28 +126,23 @@ class PDFDocumentExtractor(BaseDocumentExtractor):
         return " ".join(text_chunks)
 
     def _fallback_raw_text_extraction(self, data: bytes) -> str:
-        """Heuristic text extraction from uncompressed bytes or strings."""
         matches = re.findall(rb"\(([A-Za-z0-9 ,.\-!?;:$/%#@&*+=\(\)\[\]]{3,})\)", data)
         return " ".join([m.decode("ascii", errors="ignore") for m in matches])
 
     def _clean_pdf_text(self, text: str) -> str:
-        """Clean PDF escape sequences and format whitespace."""
-        text = text.replace(r"\(", "(").replace(r"\)", ")").replace(r"\", "\")
-        text = re.sub(r'[
-]+', '
-', text)
-        text = re.sub(r'[ 	]+', ' ', text)
+        text = text.replace(r"\(", "(").replace(r"\)", ")").replace(r"\\", "\\")
+        text = re.sub(r'[\r\n]+', '\n', text)
+        text = re.sub(r'[ \t]+', ' ', text)
         return text.strip()
 
     def _detect_text_tables(self, pages: List[str]) -> List[TableData]:
-        """Heuristic table detection for tab-delimited or pipe-delimited PDF texts."""
         tables: List[TableData] = []
         table_idx = 1
         for p_idx, page in enumerate(pages, start=1):
             lines = page.splitlines()
             potential_table_rows: List[List[str]] = []
             for line in lines:
-                parts = [p.strip() for p in re.split(r'[	|]|\s{3,}', line) if p.strip()]
+                parts = [p.strip() for p in re.split(r'[\t|]|\s{3,}', line) if p.strip()]
                 if len(parts) >= 3:
                     potential_table_rows.append(parts)
             
@@ -184,7 +161,6 @@ class PDFDocumentExtractor(BaseDocumentExtractor):
         return tables
 
     def _extract_headings(self, text: str) -> List[str]:
-        """Identify section titles from uppercase or capitalized lines."""
         headings: List[str] = []
         for line in text.splitlines():
             line = line.strip()

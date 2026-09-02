@@ -95,7 +95,6 @@ class DocumentValidator:
     @staticmethod
     def sanitize_title(title: str, max_len: int = 150) -> str:
         """Clean human-readable title string."""
-        cleaned = re.sub(r'[
-	]+', ' ', title).strip()
+        cleaned = re.sub(r'[\r\n\t]+', ' ', title).strip()
         cleaned = re.sub(r'\s+', ' ', cleaned)
         return cleaned[:max_len] if cleaned else "Untitled Document"

@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
+from app.core.config import settings, BASE_DIR
 from app.core.database import get_db, init_db
 from app.core.logging_config import setup_logging
 from app.core.middleware import ProcessTimerAndSecurityMiddleware
@@ -47,8 +47,8 @@ app = FastAPI(
 app.add_middleware(ProcessTimerAndSecurityMiddleware)
 
 # Mount Static Files & Templates
-app.mount("/static", StaticFiles(directory=str(settings.BASE_DIR / "app" / "static")), name="static")
-templates = Jinja2Templates(directory=str(settings.BASE_DIR / "app" / "templates"))
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "app" / "static")), name="static")
+templates = Jinja2Templates(directory=str(BASE_DIR / "app" / "templates"))
 
 # Mount API Routers
 app.include_router(api_v1_router)

@@ -1,7 +1,5 @@
 """
 Excel Spreadsheet (XLSX) Extractor.
-Parses multi-sheet workbooks using openpyxl with fallback pure-ZIP XML parser,
-extracting matrices, formulas, and statistical distributions.
 """
 import logging
 from typing import List, Dict, Any
@@ -46,14 +44,12 @@ class XLSXDocumentExtractor(BaseDocumentExtractor):
                 headers = rows_data[0]
                 data_rows = rows_data[1:] if len(rows_data) > 1 else []
                 
-                # Text summary for NLP
                 sheet_text_lines = [f"Spreadsheet Sheet: '{sheet_name}' (Columns: {', '.join(headers)})"]
                 for r_idx, r in enumerate(data_rows[:80], start=1):
                     cell_pairs = [f"{h}: {v}" for h, v in zip(headers, r) if v.strip()]
                     sheet_text_lines.append(f"Row {r_idx}: " + " | ".join(cell_pairs))
                 
-                sheet_text = "
-".join(sheet_text_lines)
+                sheet_text = "\n".join(sheet_text_lines)
                 full_text_parts.append(sheet_text)
                 
                 table = TableData(
@@ -83,10 +79,7 @@ class XLSXDocumentExtractor(BaseDocumentExtractor):
                 ))
             
             wb.close()
-            
-            full_text = "
-
-".join(full_text_parts)
+            full_text = "\n\n".join(full_text_parts)
             
             return ExtractionResult(
                 file_type="xlsx",

@@ -1,0 +1,37 @@
+/* Advanced Data Tables, Highlighting, and Tabular Matrices */
+.advanced-matrix-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+}
+
+.matrix-header-cell {
+    background: var(--slate-50);
+    padding: 0.85rem 1.25rem;
+    font-weight: 700;
+    color: var(--slate-700);
+    text-align: left;
+    border-bottom: 2px solid var(--slate-200);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.matrix-body-cell {
+    padding: 0.75rem 1.25rem;
+    color: var(--slate-800);
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--slate-100);
+}
+
+.matrix-row:hover {
+    background: var(--slate-50);
+}
+
+.sort-indicator {
+    display: inline-block;
+    margin-left: 0.35rem;
+    color: var(--slate-400);
+    font-size: 0.75rem;
+}

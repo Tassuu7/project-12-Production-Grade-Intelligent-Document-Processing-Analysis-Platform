@@ -45,6 +45,6 @@ class DocumentDetailResponse(DocumentResponse):
     key_points: Optional[List[str]] = None
     anomaly_findings: Optional[List[Dict[str, Any]]] = None
     tables: Optional[List[Dict[str, Any]]] = None
-    tabular_stats: Optional[Dict[str, Any]]] = None
+    tabular_stats: Optional[Dict[str, Any]] = None
     alternative_categories: Optional[List[Dict[str, Any]]] = None
     similar_documents: Optional[List[Dict[str, Any]]] = None

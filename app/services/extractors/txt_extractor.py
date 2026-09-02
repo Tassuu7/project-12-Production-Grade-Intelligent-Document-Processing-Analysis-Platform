@@ -1,7 +1,5 @@
 """
 Plain Text (TXT) Document Extractor.
-Auto-detects multi-encodings (UTF-8, Latin-1, CP1252, ASCII, UTF-16), normalizes whitespace,
-and partitions paragraphs.
 """
 import re
 import logging
@@ -23,23 +21,17 @@ class TXTDocumentExtractor(BaseDocumentExtractor):
             raw_bytes = self._read_bytes(filepath)
             text, detected_encoding = self._decode_resilient(raw_bytes)
             
-            # Normalize line breaks and tabs
-            normalized_text = re.sub(r'
-|', '
-', text)
-            normalized_text = re.sub(r'[ 	]+', ' ', normalized_text)
+            normalized_text = text.replace("\r\n", "\n").replace("\r", "\n")
+            normalized_text = re.sub(r'[ \t]+', ' ', normalized_text)
             
             lines = normalized_text.splitlines()
-            paragraphs = [p.strip() for p in normalized_text.split("
-
-") if p.strip()]
+            paragraphs = [p.strip() for p in normalized_text.split("\n\n") if p.strip()]
             
             words = normalized_text.split()
             total_words = len(words)
             total_chars = len(normalized_text)
             total_lines = len(lines)
             
-            # Partition into logical pages (~400 words per page)
             chunk_size = 400
             pages: List[PageContent] = []
             for i in range(0, max(1, total_words), chunk_size):

@@ -1,6 +1,5 @@
 """
 Pure-Python DOCX Extractor using zipfile and xml.etree.ElementTree.
-Parses WordprocessingML: paragraphs, heading styles, tables, headers, footers, and metadata.
 """
 import zipfile
 import xml.etree.ElementTree as ET
@@ -31,7 +30,6 @@ class DOCXDocumentExtractor(BaseDocumentExtractor):
                 raise ExtractionFailedException(filepath, "File is not a valid ZIP/DOCX container")
             
             with zipfile.ZipFile(filepath, "r") as docx_zip:
-                # Read main document XML
                 if "word/document.xml" not in docx_zip.namelist():
                     raise ExtractionFailedException(filepath, "Missing word/document.xml inside DOCX archive")
                 
@@ -42,39 +40,29 @@ class DOCXDocumentExtractor(BaseDocumentExtractor):
                 headings: List[str] = []
                 tables: List[TableData] = []
                 
-                # Extract paragraphs and headings
                 for p in root.findall(".//w:p", WORD_NS):
                     p_text = self._extract_text_from_node(p)
                     if p_text:
                         paragraphs.append(p_text)
-                        # Check style for headings
                         p_style = p.find(".//w:pStyle", WORD_NS)
                         if p_style is not None:
                             val = p_style.attrib.get(f"{{{WORD_NS['w']}}}val", "")
                             if "Heading" in val or "Title" in val:
                                 headings.append(p_text)
                 
-                # Extract tables
                 tbl_elements = root.findall(".//w:tbl", WORD_NS)
                 for tbl_idx, tbl in enumerate(tbl_elements, start=1):
                     t_data = self._extract_table_from_node(tbl, tbl_idx)
                     if t_data:
                         tables.append(t_data)
                 
-                # Extract metadata if core.xml exists
                 meta = self._extract_docx_metadata(docx_zip)
             
-            full_text = "
-
-".join(paragraphs).strip()
+            full_text = "\n\n".join(paragraphs).strip()
             total_words = len(full_text.split())
             total_chars = len(full_text)
             total_lines = len(full_text.splitlines())
             
-            # Approximate page count (Word is flowable: ~350 words per standard page)
-            approx_pages = max(1, (total_words // 350) + (1 if total_words % 350 > 0 else 0))
-            
-            # Split into synthetic pages for unified pagination
             pages: List[PageContent] = []
             words_list = full_text.split()
             chunk_size = 350
@@ -108,7 +96,6 @@ class DOCXDocumentExtractor(BaseDocumentExtractor):
             raise ExtractionFailedException(filepath, str(e))
 
     def _extract_text_from_node(self, node: ET.Element) -> str:
-        """Extract all text nodes from a paragraph or run element."""
         text_pieces: List[str] = []
         for t in node.findall(".//w:t", WORD_NS):
             if t.text:
@@ -116,7 +103,6 @@ class DOCXDocumentExtractor(BaseDocumentExtractor):
         return "".join(text_pieces).strip()
 
     def _extract_table_from_node(self, tbl_node: ET.Element, table_idx: int) -> Optional[TableData]:
-        """Parse table row and cell elements from w:tbl."""
         rows: List[List[str]] = []
         for tr in tbl_node.findall(".//w:tr", WORD_NS):
             row_cells: List[str] = []

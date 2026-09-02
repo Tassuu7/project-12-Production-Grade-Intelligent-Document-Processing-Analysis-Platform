@@ -1,0 +1,75 @@
+/* Standalone and Inline Analysis Reports Styling */
+.report-page-container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 2.5rem;
+    border: 1px solid var(--slate-200);
+}
+
+.report-header-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--primary-600);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.report-title-heading {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--slate-900);
+    letter-spacing: -0.025em;
+}
+
+.report-section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-900);
+    margin: 2rem 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.report-summary-box {
+    background: var(--primary-50);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--primary-950);
+}
+
+.metric-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+}
+
+.metric-kpi-box {
+    background: var(--slate-50);
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    text-align: center;
+}
+
+.metric-kpi-val {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--primary-700);
+    margin-bottom: 0.25rem;
+}
+
+.metric-kpi-lbl {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--slate-500);
+    text-transform: uppercase;
+}
