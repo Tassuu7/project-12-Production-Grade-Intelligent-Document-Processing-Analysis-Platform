@@ -45,7 +45,10 @@
     </div>
     <div class="stat-card">
         <div class="stat-icon blue">
-            <div style="font-size: 1.3rem; font-weight: 700;">{{ (user.storage_used_bytes / (1024 * 1024)) | round(1) }} MB</div>
+            <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; stroke: currentColor;"><use href="/static/icons/icons.svg#icon-server"></use></svg>
+        </div>
+        <div>
+            <div class="stat-val">{{ (user.storage_used_bytes / (1024 * 1024)) | round(1) }} MB</div>
             <div class="stat-label">Storage Used</div>
         </div>
     </div>
@@ -79,9 +82,9 @@
                         </td>
                         <td><span class="badge" style="background: var(--slate-100);">{{ doc.file_type | upper }}</span></td>
                         <td>
-                            {% if doc.analysis_result %}
+                            {% if doc.category or (doc.analysis_result and doc.analysis_result.category_predicted) %}
                             <span class="badge" style="background: var(--primary-50); color: var(--primary-700);">
-                                {{ doc.analysis_result.category_predicted }}
+                                {{ doc.category or doc.analysis_result.category_predicted }}
                             </span>
                             {% else %}
                             <span style="color: var(--slate-400);">-</span>

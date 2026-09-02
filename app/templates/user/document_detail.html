@@ -33,7 +33,7 @@
             </div>
             <div style="text-align: right;">
                 <div style="font-size: 2.25rem; font-weight: 900; color: #1e40af;">{{ resume_data.top_match_score }}%</div>
-                <div style="font-size: 0.8rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Job Role Match Fit</div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Top Role Match Score</div>
                 <span class="badge" style="background: {{ resume_data.experience_summary.badge_color }}; color: white; margin-top: 0.25rem;">
                     {{ resume_data.experience_summary.seniority_level }} (~{{ resume_data.experience_summary.estimated_years }} yrs)
                 </span>
@@ -41,9 +41,28 @@
         </div>
     </div>
 
+    <!-- Interactive Custom Job Description Matcher -->
+    <div style="padding: 1.25rem 0; border-bottom: 1px solid var(--slate-100); background: #f0f9ff; margin: 0 -1.5rem; padding: 1.25rem 1.5rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #0369a1; margin-bottom: 0.5rem;">🎯 Live Job Description Fit Matcher</h3>
+        <p style="font-size: 0.85rem; color: var(--slate-600); margin-bottom: 0.75rem;">Paste any specific Job Description below to calculate instant candidate fit percentage and matching skill breakdown:</p>
+        <div style="display: flex; gap: 0.75rem;">
+            <textarea id="jd-input" class="input-field" rows="3" style="flex: 1; font-size: 0.85rem;" placeholder="e.g. We are looking for a Senior Python Developer with experience in FastAPI, Docker, PostgreSQL, and AWS..."></textarea>
+            <button type="button" class="btn btn-primary" onclick="calculateJDScore()" style="align-self: flex-start; padding: 0.75rem 1.25rem;">Calculate Match</button>
+        </div>
+        <div id="jd-result" style="display: none; margin-top: 1rem; padding: 1rem; background: #ffffff; border-radius: 6px; border: 1px solid #bae6fd;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <strong style="color: var(--slate-800);">Job Description Compatibility:</strong>
+                <span id="jd-score-badge" style="font-size: 1.25rem; font-weight: 900; color: #0284c7;">85%</span>
+            </div>
+            <div id="jd-matched-skills" style="font-size: 0.85rem; color: var(--slate-700); margin-bottom: 0.25rem;"></div>
+            <div id="jd-missing-skills" style="font-size: 0.85rem; color: var(--slate-500);"></div>
+        </div>
+    </div>
+
     <!-- Job Fit Recommendations -->
+    {% if resume_data.role_matches %}
     <div style="padding: 1.25rem 0; border-bottom: 1px solid var(--slate-100);">
-        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--slate-800); margin-bottom: 0.75rem;">💼 Job Role Fit Recommendations</h3>
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--slate-800); margin-bottom: 0.75rem;">💼 Automatic Role Fit Rankings</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
             {% for match in resume_data.role_matches %}
             <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 8px; padding: 1rem;">
@@ -63,8 +82,10 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
 
     <!-- Categorized Skill Matrix -->
+    {% if resume_data.skills_matrix %}
     <div style="padding: 1.25rem 0; border-bottom: 1px solid var(--slate-100);">
         <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--slate-800); margin-bottom: 0.75rem;">🛠️ Extracted Technical & Domain Skills ({{ resume_data.total_skills_count }})</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
@@ -80,6 +101,7 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
 
     <!-- Education History -->
     {% if resume_data.education %}
@@ -196,4 +218,40 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function calculateJDScore() {
+    const jdText = document.getElementById('jd-input').value.trim().toLowerCase();
+    if (!jdText) {
+        alert('Please enter a job description to calculate score.');
+        return;
+    }
+    
+    // Extract candidate skills from rendered page
+    const skillBadges = Array.from(document.querySelectorAll('.card span.badge')).map(el => el.innerText.trim().toLowerCase());
+    const matched = [];
+    const keywords = ['python', 'javascript', 'typescript', 'react', 'fastapi', 'django', 'aws', 'docker', 'kubernetes', 'sql', 'postgresql', 'mongodb', 'git', 'linux', 'ci/cd', 'machine learning', 'pytorch', 'tensorflow', 'rest api'];
+    
+    let jdTerms = keywords.filter(k => jdText.includes(k));
+    if (jdTerms.length === 0) {
+        jdTerms = jdText.split(/\s+/).filter(w => w.length > 4).slice(0, 10);
+    }
+    
+    jdTerms.forEach(term => {
+        if (skillBadges.some(s => s.includes(term)) || document.body.innerText.toLowerCase().includes(term)) {
+            matched.push(term);
+        }
+    });
+    
+    const score = Math.min(98, Math.max(50, Math.round((matched.length / Math.max(1, jdTerms.length)) * 90 + 10)));
+    const missing = jdTerms.filter(t => !matched.includes(t));
+    
+    document.getElementById('jd-result').style.display = 'block';
+    document.getElementById('jd-score-badge').innerText = `${score}% Match`;
+    document.getElementById('jd-matched-skills').innerHTML = `<strong>Matched Job Requirements:</strong> <span style="color: #166534;">${matched.length ? matched.join(', ') : 'General profile alignment'}</span>`;
+    document.getElementById('jd-missing-skills').innerHTML = `<strong>Missing / Skill Gaps:</strong> <span style="color: #991b1b;">${missing.length ? missing.join(', ') : 'None identified'}</span>`;
+}
+</script>
 {% endblock %}

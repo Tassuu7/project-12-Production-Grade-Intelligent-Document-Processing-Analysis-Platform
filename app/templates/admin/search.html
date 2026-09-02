@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Search Studio{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Global Document Search Studio</h1>
+        <p class="page-subtitle">Full-text search, faceted category indexing, and cross-user document discovery.</p>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 2rem;">
+    <form method="GET" action="/admin/search" style="display: flex; gap: 0.75rem;">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ query }}" 
+            placeholder="Search keywords, metadata, candidates, invoices, or extracted text across all users..." 
+            class="input-field" 
+            style="flex: 1;"
+            autofocus
+        >
+        <button type="submit" class="btn btn-primary">Search Platform</button>
+    </form>
+</div>
+
+{% if query %}
+<div style="margin-bottom: 1rem; color: var(--slate-600); font-weight: 500;">
+    Found <strong>{{ results|length }}</strong> result(s) across enterprise corpus for "<em>{{ query }}</em>"
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 1rem;">
+    {% for res in results %}
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <div>
+                <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;">
+                    <a href="/documents/{{ res.document_id }}" style="color: #1e40af; text-decoration: none;">{{ res.title }}</a>
+                </h3>
+                <div style="font-size: 0.8rem; color: var(--slate-500);">
+                    File: <code>{{ res.original_filename }}</code> | Owner User ID: {{ res.user_id }} | Uploaded: {{ res.created_at }}
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <span class="badge" style="background: #eff6ff; color: #1e40af; font-weight: 700;">{{ res.category or 'General' }}</span>
+                <div style="font-size: 0.75rem; color: var(--slate-400); margin-top: 0.25rem;">Score: {{ res.relevance_score|round(2) }}</div>
+            </div>
+        </div>
+        
+        <p style="font-size: 0.9rem; color: var(--slate-700); line-height: 1.6; background: #f8fafc; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--slate-200);">
+            {{ res.snippet_highlight | safe }}
+        </p>
+    </div>
+    {% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <p style="color: var(--slate-500); font-size: 1.1rem;">No matching documents found in enterprise corpus.</p>
+        <p style="color: var(--slate-400); font-size: 0.85rem; margin-top: 0.5rem;">Try refining search terms or keywords.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

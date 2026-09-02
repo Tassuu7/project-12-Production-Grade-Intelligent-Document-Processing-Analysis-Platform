@@ -4,7 +4,7 @@ FastAPI Application Entrypoint, Route Registrations, Middleware Mounting, and St
 import json
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi import FastAPI, Request, Depends, HTTPException, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -129,7 +129,7 @@ def document_detail_view(document_id: int, request: Request, user: User = Depend
     if not doc or (user.role != "admin" and doc.user_id != user.id):
         raise HTTPException(status_code=404, detail="Document not found.")
         
-    if doc.status in ["queued", "processing"] and not doc.analysis_result:
+    if doc.status in ["queued", "processing"] or not doc.analysis_result:
         from app.services.queue.task_runner import execute_processing_job
         job = db.query(ProcessingJob).filter(ProcessingJob.document_id == doc.id).order_by(ProcessingJob.id.desc()).first()
         if job:
@@ -219,7 +219,7 @@ def admin_dashboard(request: Request, user: User = Depends(get_current_user_opti
         "active_jobs": act_jobs,
         "success_rate": round((comp_docs / max(1, comp_docs + fail_docs)) * 100, 1)
     }
-    recent_logs = db.query(AuditLog).order_by(AuditLog.created_at.desc()).limit(10).all()
+    recent_logs = db.query(AuditLog).order_by(AuditLog.created_at.desc()).limit(15).all()
     
     return templates.TemplateResponse(request=request, name="admin/dashboard.html", context={
         "request": request,
@@ -256,6 +256,24 @@ def admin_documents(request: Request, user: User = Depends(get_current_user_opti
         "documents": docs
     })
 
+@app.get("/admin/search", response_class=HTMLResponse)
+def admin_search_view(request: Request, q: str = "", user: User = Depends(get_current_user_optional), db: Session = Depends(get_db)):
+    if not user or user.role != "admin":
+        return RedirectResponse(url="/login")
+    results = []
+    if q.strip():
+        svc = SearchService()
+        search_res = svc.search(db, q.strip(), user_id=None, is_admin=True)
+        results = search_res.results
+    return templates.TemplateResponse(request=request, name="admin/search.html", context={
+        "request": request,
+        "user": user,
+        "is_admin": True,
+        "active_page": "admin_search",
+        "query": q,
+        "results": results
+    })
+
 @app.get("/admin/jobs", response_class=HTMLResponse)
 def admin_jobs(request: Request, user: User = Depends(get_current_user_optional), db: Session = Depends(get_db)):
     if not user or user.role != "admin":
@@ -280,15 +298,4 @@ def admin_audit_logs(request: Request, user: User = Depends(get_current_user_opt
         "is_admin": True,
         "active_page": "admin_audit",
         "logs": logs
-    })
-
-@app.get("/admin/health", response_class=HTMLResponse)
-def admin_health(request: Request, user: User = Depends(get_current_user_optional)):
-    if not user or user.role != "admin":
-        return RedirectResponse(url="/login")
-    return templates.TemplateResponse(request=request, name="admin/health.html", context={
-        "request": request,
-        "user": user,
-        "is_admin": True,
-        "active_page": "admin_health"
     })
