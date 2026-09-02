@@ -1,0 +1,10 @@
+Quarter,Department,Operating_Revenue,Operating_Expenses,Net_Income,Gross_Margin_Pct,Status
+Q1-2026,Engineering,4500000,2800000,1700000,62.2,Audited
+Q1-2026,Sales_Marketing,3200000,2100000,1100000,58.5,Audited
+Q1-2026,Operations,1800000,1200000,600000,52.0,Audited
+Q2-2026,Engineering,5200000,3100000,2100000,65.0,Audited
+Q2-2026,Sales_Marketing,3900000,2400000,1500000,61.5,Audited
+Q2-2026,Operations,2100000,1350000,750000,55.8,Audited
+Q3-2026,Engineering,5800000,3400000,2400000,66.4,Preliminary
+Q3-2026,Sales_Marketing,4300000,2650000,1650000,62.8,Preliminary
+Q3-2026,Operations,2300000,1450000,850000,57.2,Preliminary
