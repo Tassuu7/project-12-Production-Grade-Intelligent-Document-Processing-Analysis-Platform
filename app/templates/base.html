@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Intelligent Document Platform{% endblock %} - IDPAP Enterprise</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/document_viewer.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="top-navbar">
+        <div class="nav-brand">
+            <svg viewBox="0 0 24 24"><use href="/static/icons/icons.svg#icon-document"></use></svg>
+            <span>Nexus DocIntel</span>
+        </div>
+        
+        <nav>
+            <ul class="nav-links">
+                {% if is_admin %}
+                <li><a href="/admin/dashboard" class="nav-item {% if active_page == 'admin_dash' %}active{% endif %}">Admin Overview</a></li>
+                <li><a href="/admin/users" class="nav-item {% if active_page == 'admin_users' %}active{% endif %}">Users</a></li>
+                <li><a href="/admin/documents" class="nav-item {% if active_page == 'admin_docs' %}active{% endif %}">All Documents</a></li>
+                <li><a href="/admin/jobs" class="nav-item {% if active_page == 'admin_jobs' %}active{% endif %}">Processing Jobs</a></li>
+                <li><a href="/admin/audit-logs" class="nav-item {% if active_page == 'admin_audit' %}active{% endif %}">Audit Logs</a></li>
+                <li><a href="/admin/health" class="nav-item {% if active_page == 'admin_health' %}active{% endif %}">Health & Settings</a></li>
+                {% else %}
+                <li><a href="/dashboard" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+                <li><a href="/upload" class="nav-item {% if active_page == 'upload' %}active{% endif %}">Upload Documents</a></li>
+                <li><a href="/documents" class="nav-item {% if active_page == 'documents' %}active{% endif %}">My Documents</a></li>
+                <li><a href="/search" class="nav-item {% if active_page == 'search' %}active{% endif %}">Search Studio</a></li>
+                <li><a href="/reports" class="nav-item {% if active_page == 'reports' %}active{% endif %}">Reports</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <div class="user-profile-menu">
+            <span class="role-badge {{ 'admin' if is_admin else 'user' }}">{{ 'ADMIN' if is_admin else 'USER' }}</span>
+            <span style="font-weight: 600; color: var(--slate-700);">{{ user.full_name if user else 'Account' }}</span>
+            <button class="btn btn-sm btn-secondary" onclick="API.logout()">Logout</button>
+        </div>
+    </header>
+
+    <main class="page-body">
+        {% block content %}{% endblock %}
+    </main>
+
+    <div id="toast-container"></div>
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/charts.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

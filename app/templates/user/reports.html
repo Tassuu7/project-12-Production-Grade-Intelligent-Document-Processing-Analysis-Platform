@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Reports Studio{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Analysis Reports Studio</h1>
+        <p class="page-subtitle">Generate and download comprehensive analysis exports in PDF, HTML, JSON, and CSV.</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Document</th>
+                    <th>Category</th>
+                    <th>Export HTML</th>
+                    <th>Export PDF</th>
+                    <th>Export JSON</th>
+                    <th>Export CSV</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                <tr>
+                    <td><strong>{{ doc.title }}</strong></td>
+                    <td>{{ doc.analysis_result.category_predicted if doc.analysis_result else '-' }}</td>
+                    <td><a href="/api/v1/reports/document/{{ doc.id }}?format=html" target="_blank" class="btn btn-sm btn-secondary">HTML</a></td>
+                    <td><a href="/api/v1/reports/document/{{ doc.id }}?format=pdf" target="_blank" class="btn btn-sm btn-primary">PDF</a></td>
+                    <td><a href="/api/v1/reports/document/{{ doc.id }}?format=json" target="_blank" class="btn btn-sm btn-secondary">JSON</a></td>
+                    <td><a href="/api/v1/reports/document/{{ doc.id }}?format=csv" target="_blank" class="btn btn-sm btn-secondary">CSV</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

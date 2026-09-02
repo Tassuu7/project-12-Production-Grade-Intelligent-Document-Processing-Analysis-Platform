@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Admin - Background Jobs{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Background Job Queue Monitor</h1>
+        <p class="page-subtitle">Monitor real-time document extraction and ML pipeline background jobs.</p>
+    </div>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Job ID</th>
+                    <th>Doc ID</th>
+                    <th>User ID</th>
+                    <th>Status</th>
+                    <th>Attempts</th>
+                    <th>Duration</th>
+                    <th>Started</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>#{{ job.id }}</td>
+                    <td>{{ job.document_id }}</td>
+                    <td>{{ job.user_id }}</td>
+                    <td><span class="badge badge-{{ job.status | lower }}">{{ job.status }}</span></td>
+                    <td>{{ job.attempts }} / {{ job.max_attempts }}</td>
+                    <td>{{ job.duration_ms | round(1) }} ms</td>
+                    <td>{{ job.started_at.strftime('%Y-%m-%d %H:%M:%S') if job.started_at else '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

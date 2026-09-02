@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Search Studio{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Document Search Studio</h1>
+        <p class="page-subtitle">Full-text and faceted search across document titles, extracted bodies, keywords, and topics.</p>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 1.5rem;">
+    <form action="/search" method="GET" style="display: flex; gap: 0.75rem;">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search keywords, phrases, invoice numbers, applicant names..." style="flex: 1;" required>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+</div>
+
+{% if query %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Search Results for "{{ query }}" ({{ results | length }} matches)</h2>
+    </div>
+    {% for res in results %}
+    <div style="padding: 1rem 0; border-bottom: 1px solid var(--slate-100);">
+        <h3 style="font-size: 1.1rem; font-weight: 700;">
+            <a href="/documents/{{ res.document_id }}">{{ res.title }}</a>
+        </h3>
+        <div style="font-size: 0.8rem; color: var(--slate-500); margin: 0.25rem 0;">
+            Category: <span class="badge" style="background: var(--primary-50); color: var(--primary-700);">{{ res.category }}</span> &bull; File: {{ res.original_filename }}
+        </div>
+        <div style="font-size: 0.9rem; color: var(--slate-700); line-height: 1.5;">
+            {{ res.snippet_highlight | safe }}
+        </div>
+    </div>
+    {% else %}
+    <p style="color: var(--slate-500); text-align: center; padding: 2rem;">No matching documents found for "{{ query }}".</p>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
