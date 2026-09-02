@@ -13,7 +13,7 @@ router = APIRouter(prefix="/reports", tags=["Reports"])
 @router.get("/document/{document_id}")
 def generate_document_report(
     document_id: int,
-    format: str = Query("html", regex="^(html|pdf|json|csv)$"),
+    format: str = Query("html", pattern="^(html|pdf|json|csv)$"),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

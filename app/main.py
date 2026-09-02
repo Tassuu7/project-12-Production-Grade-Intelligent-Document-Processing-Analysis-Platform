@@ -67,7 +67,7 @@ def index_redirect(user: User = Depends(get_current_user_optional)):
 def login_page(request: Request, user: User = Depends(get_current_user_optional)):
     if user:
         return RedirectResponse(url="/admin/dashboard" if user.role == "admin" else "/dashboard")
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="login.html", context={})
 
 @app.get("/dashboard", response_class=HTMLResponse)
 def user_dashboard(request: Request, user: User = Depends(get_current_user_optional), db: Session = Depends(get_db)):
@@ -82,7 +82,7 @@ def user_dashboard(request: Request, user: User = Depends(get_current_user_optio
         "completed_documents": len([d for d in docs if d.status == "completed"]),
         "processing_documents": len([d for d in docs if d.status in ["queued", "processing"]])
     }
-    return templates.TemplateResponse("user/dashboard.html", {
+    return templates.TemplateResponse(request=request, name="user/dashboard.html", context={
         "request": request,
         "user": user,
         "is_admin": False,
@@ -95,7 +95,7 @@ def user_dashboard(request: Request, user: User = Depends(get_current_user_optio
 def upload_page(request: Request, user: User = Depends(get_current_user_optional)):
     if not user:
         return RedirectResponse(url="/login")
-    return templates.TemplateResponse("user/upload.html", {
+    return templates.TemplateResponse(request=request, name="user/upload.html", context={
         "request": request,
         "user": user,
         "is_admin": (user.role == "admin"),
@@ -107,7 +107,7 @@ def user_documents(request: Request, user: User = Depends(get_current_user_optio
     if not user:
         return RedirectResponse(url="/login")
     docs = db.query(Document).filter(Document.user_id == user.id, Document.is_deleted == False).order_by(Document.created_at.desc()).all()
-    return templates.TemplateResponse("user/documents.html", {
+    return templates.TemplateResponse(request=request, name="user/documents.html", context={
         "request": request,
         "user": user,
         "is_admin": (user.role == "admin"),
@@ -141,7 +141,7 @@ def document_detail_view(document_id: int, request: Request, user: User = Depend
                 "shared_terms": json.loads(s.shared_terms_json) if s.shared_terms_json else []
             })
             
-    return templates.TemplateResponse("user/document_detail.html", {
+    return templates.TemplateResponse(request=request, name="user/document_detail.html", context={
         "request": request,
         "user": user,
         "is_admin": (user.role == "admin"),
@@ -163,7 +163,7 @@ def search_view(request: Request, q: str = "", user: User = Depends(get_current_
         svc = SearchService()
         search_res = svc.search(db, q.strip(), user_id=user.id, is_admin=(user.role == "admin"))
         results = search_res.results
-    return templates.TemplateResponse("user/search.html", {
+    return templates.TemplateResponse(request=request, name="user/search.html", context={
         "request": request,
         "user": user,
         "is_admin": (user.role == "admin"),
@@ -177,7 +177,7 @@ def reports_view(request: Request, user: User = Depends(get_current_user_optiona
     if not user:
         return RedirectResponse(url="/login")
     docs = db.query(Document).filter(Document.user_id == user.id, Document.is_deleted == False).all()
-    return templates.TemplateResponse("user/reports.html", {
+    return templates.TemplateResponse(request=request, name="user/reports.html", context={
         "request": request,
         "user": user,
         "is_admin": (user.role == "admin"),
@@ -206,7 +206,7 @@ def admin_dashboard(request: Request, user: User = Depends(get_current_user_opti
     }
     recent_logs = db.query(AuditLog).order_by(AuditLog.created_at.desc()).limit(10).all()
     
-    return templates.TemplateResponse("admin/dashboard.html", {
+    return templates.TemplateResponse(request=request, name="admin/dashboard.html", context={
         "request": request,
         "user": user,
         "is_admin": True,
@@ -220,7 +220,7 @@ def admin_users(request: Request, user: User = Depends(get_current_user_optional
     if not user or user.role != "admin":
         return RedirectResponse(url="/login")
     users = db.query(User).all()
-    return templates.TemplateResponse("admin/users.html", {
+    return templates.TemplateResponse(request=request, name="admin/users.html", context={
         "request": request,
         "user": user,
         "is_admin": True,
@@ -233,7 +233,7 @@ def admin_documents(request: Request, user: User = Depends(get_current_user_opti
     if not user or user.role != "admin":
         return RedirectResponse(url="/login")
     docs = db.query(Document).order_by(Document.created_at.desc()).all()
-    return templates.TemplateResponse("admin/documents.html", {
+    return templates.TemplateResponse(request=request, name="admin/documents.html", context={
         "request": request,
         "user": user,
         "is_admin": True,
@@ -246,7 +246,7 @@ def admin_jobs(request: Request, user: User = Depends(get_current_user_optional)
     if not user or user.role != "admin":
         return RedirectResponse(url="/login")
     jobs = db.query(ProcessingJob).order_by(ProcessingJob.created_at.desc()).limit(50).all()
-    return templates.TemplateResponse("admin/jobs.html", {
+    return templates.TemplateResponse(request=request, name="admin/jobs.html", context={
         "request": request,
         "user": user,
         "is_admin": True,
@@ -259,7 +259,7 @@ def admin_audit_logs(request: Request, user: User = Depends(get_current_user_opt
     if not user or user.role != "admin":
         return RedirectResponse(url="/login")
     logs = db.query(AuditLog).order_by(AuditLog.created_at.desc()).limit(100).all()
-    return templates.TemplateResponse("admin/audit_logs.html", {
+    return templates.TemplateResponse(request=request, name="admin/audit_logs.html", context={
         "request": request,
         "user": user,
         "is_admin": True,
@@ -271,7 +271,7 @@ def admin_audit_logs(request: Request, user: User = Depends(get_current_user_opt
 def admin_health(request: Request, user: User = Depends(get_current_user_optional)):
     if not user or user.role != "admin":
         return RedirectResponse(url="/login")
-    return templates.TemplateResponse("admin/health.html", {
+    return templates.TemplateResponse(request=request, name="admin/health.html", context={
         "request": request,
         "user": user,
         "is_admin": True,
