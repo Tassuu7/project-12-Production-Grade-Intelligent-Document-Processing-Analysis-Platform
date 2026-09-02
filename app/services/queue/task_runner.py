@@ -1,7 +1,7 @@
 """
 Document Processing Task Runner.
 Orchestrates content extraction, ML classification, NLP keywords/topics/summary,
-similarity analysis, anomaly detection, and database status persistence.
+resume analysis, similarity analysis, anomaly detection, and database status persistence.
 """
 import time
 import json
@@ -39,7 +39,7 @@ def execute_processing_job(job_id: int, document_id: int, user_id: int) -> None:
         extractor = DocumentExtractorFactory.get_extractor(doc.file_type)
         extraction_result = extractor.extract(doc.file_path)
 
-        # Step 2: NLP & ML Pipeline (local imports to avoid circular dependencies)
+        # Step 2: NLP & ML Pipeline
         from app.services.nlp.text_preprocessor import TextPreprocessor
         from app.services.nlp.classifier import DocumentClassifier
         from app.services.nlp.keyword_extractor import KeywordExtractor
@@ -47,6 +47,7 @@ def execute_processing_job(job_id: int, document_id: int, user_id: int) -> None:
         from app.services.nlp.summarizer import ExtractiveSummarizer
         from app.services.nlp.anomaly_detector import QualityAnomalyDetector
         from app.services.nlp.similarity_engine import DocumentSimilarityEngine
+        from app.services.nlp.resume_analyzer import ResumeJobAnalyzer
 
         # Preprocess text
         preprocessor = TextPreprocessor()
@@ -72,6 +73,15 @@ def execute_processing_job(job_id: int, document_id: int, user_id: int) -> None:
         anomaly_detector = QualityAnomalyDetector()
         anomalies = anomaly_detector.analyze(doc, extraction_result, cleaned_text)
 
+        # Resume & Candidate Job Fit Analysis
+        resume_analyzer = ResumeJobAnalyzer()
+        resume_findings = resume_analyzer.analyze(extraction_result.raw_text, doc.original_filename)
+        
+        # If resume detected with high confidence, set category
+        if resume_findings.get("is_resume"):
+            clf_result["predicted_category"] = "Resume / CV"
+            clf_result["confidence"] = max(0.92, clf_result.get("confidence", 0.8))
+
         # Persist Analysis Results
         existing_res = db.query(AnalysisResult).filter(AnalysisResult.document_id == doc.id).first()
         if existing_res:
@@ -95,13 +105,15 @@ def execute_processing_job(job_id: int, document_id: int, user_id: int) -> None:
             summary_sentences_json=json.dumps(summary_res["sentences"]),
             key_points_json=json.dumps(summary_res["key_points"]),
             anomaly_findings_json=json.dumps(anomalies),
-            tabular_stats_json=json.dumps(extraction_result.tabular_statistics) if extraction_result.tabular_statistics else None
+            tabular_stats_json=json.dumps(extraction_result.tabular_statistics) if extraction_result.tabular_statistics else None,
+            readability_scores_json=json.dumps(resume_findings) if resume_findings.get("is_resume") else None
         )
         db.add(analysis)
 
         # Update Document quantitative metrics
         duration_ms = (time.perf_counter() - start_time) * 1000
         doc.status = "completed"
+        doc.category = clf_result["predicted_category"]
         doc.page_count = extraction_result.page_count
         doc.word_count = extraction_result.word_count
         doc.character_count = extraction_result.character_count

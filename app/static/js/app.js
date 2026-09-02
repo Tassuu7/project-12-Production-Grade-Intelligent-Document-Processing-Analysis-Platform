@@ -70,3 +70,27 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 200);
     }, 4000);
 }
+
+// Automatically convert timestamps to browser's exact local timezone
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.local-timestamp').forEach(el => {
+        const utcStr = el.getAttribute('data-utc');
+        if (utcStr) {
+            try {
+                const date = new Date(utcStr.endsWith('Z') ? utcStr : utcStr + 'Z');
+                if (!isNaN(date.getTime())) {
+                    el.innerText = date.toLocaleString([], {
+                        year: 'numeric',
+                        month: 'short',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+                }
+            } catch (e) {}
+        }
+    });
+});
+

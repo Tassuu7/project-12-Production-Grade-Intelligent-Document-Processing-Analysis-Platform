@@ -129,11 +129,19 @@ def document_detail_view(document_id: int, request: Request, user: User = Depend
     if not doc or (user.role != "admin" and doc.user_id != user.id):
         raise HTTPException(status_code=404, detail="Document not found.")
         
+    if doc.status in ["queued", "processing"] and not doc.analysis_result:
+        from app.services.queue.task_runner import execute_processing_job
+        job = db.query(ProcessingJob).filter(ProcessingJob.document_id == doc.id).order_by(ProcessingJob.id.desc()).first()
+        if job:
+            execute_processing_job(job.id, doc.id, doc.user_id)
+            db.refresh(doc)
+
     res = doc.analysis_result
     keywords = json.loads(res.keywords_json) if res and res.keywords_json else []
     topics = json.loads(res.topics_json) if res and res.topics_json else []
     tables = json.loads(res.tables_data_json) if res and res.tables_data_json else []
     anomalies = json.loads(res.anomaly_findings_json) if res and res.anomaly_findings_json else []
+    resume_data = json.loads(res.readability_scores_json) if res and res.readability_scores_json else None
     
     sim_records = db.query(DocumentSimilarity).filter(DocumentSimilarity.source_document_id == doc.id).all()
     similar_docs = []
@@ -157,7 +165,8 @@ def document_detail_view(document_id: int, request: Request, user: User = Depend
         "topics": topics,
         "tables": tables,
         "anomalies": anomalies,
-        "similar_docs": similar_docs
+        "similar_docs": similar_docs,
+        "resume_data": resume_data
     })
 
 @app.get("/search", response_class=HTMLResponse)
