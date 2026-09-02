@@ -1,12 +1,26 @@
 # Nexus DocIntel - Intelligent Document Processing & Analysis Platform
 
-![Nexus DocIntel Platform](https://img.shields.io/badge/Platform-Nexus%20DocIntel-1e40af)
-![Python 3.14](https://img.shields.io/badge/Python-3.14-blue)
+![Nexus DocIntel Platform](https://img.shields.io/badge/Platform-Nexus%20DocIntel-dc2626)
+![Python 3.14](https://img.shields.io/badge/Python-3.14-ea580c)
 ![FastAPI](https://img.shields.io/badge/Framework-FastAPI-059669)
-![Architecture](https://img.shields.io/badge/Architecture-100%25%20Local%20NLP-2563eb)
+![Architecture](https://img.shields.io/badge/Architecture-100%25%20Local%20NLP-b91c1c)
+![Theme](https://img.shields.io/badge/Theme-Flame%20Orange%20%26%20Crimson-ea580c)
 ![Tests](https://img.shields.io/badge/Tests-32%20Passed-10b981)
 
-An enterprise-grade, human-engineered Intelligent Document Processing (IDP) and analysis platform built with a 100% local mathematical NLP pipeline, pure-Python document extractors, responsive blue UI design system, and multi-tenant Role-Based Access Control.
+An enterprise-grade, human-engineered Intelligent Document Processing (IDP) and analysis platform built with a 100% local mathematical NLP pipeline, pure-Python document extractors, responsive warm flame orange & electric crimson UI design system, and multi-tenant Role-Based Access Control.
+
+---
+
+## 🔀 Pull Requests & Git Branches
+
+This repository features structured modular branches and 4 merged feature Pull Requests on `main`:
+
+| PR # | Branch | Title | Status |
+| :--- | :--- | :--- | :--- |
+| **PR #1** | [`feature/core-engine`](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/tree/feature/core-engine) | **Core Extraction Engine**: Multi-format pure-Python parsers for PDF, DOCX, TXT, CSV, and XLSX files | `MERGED` |
+| **PR #2** | [`feature/ml-nlp-pipeline`](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/tree/feature/ml-nlp-pipeline) | **Mathematical NLP Pipeline**: TF-IDF Naive Bayes hybrid classifier, TextRank summarization, and deep Resume / Candidate Intelligence | `MERGED` |
+| **PR #3** | [`feature/dashboards-and-ui`](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/tree/feature/dashboards-and-ui) | **UI & Responsive Dashboards**: Warm flame orange & crimson design system, dynamic category distribution charts, and live Job Description Matcher | `MERGED` |
+| **PR #4** | [`feature/admin-audit-reports`](https://github.com/Tassuu7/project-12-Production-Grade-Intelligent-Document-Processing-Analysis-Platform/tree/feature/admin-audit-reports) | **RBAC & Admin Command Center**: Global Search Studio, user directory, real background job queue monitor, and immutable audit logs | `MERGED` |
 
 ---
 
@@ -15,14 +29,15 @@ An enterprise-grade, human-engineered Intelligent Document Processing (IDP) and 
 - **100% Local Machine Learning & NLP**: Zero external cloud API calls or third-party LLM dependencies. Operates entirely offline with strict data sovereignty.
 - **Multi-Format Extraction Engine**: Resilient pure-Python parsers for **PDF, DOCX, TXT, CSV, and XLSX** files up to 50 MB.
 - **11-Category Hybrid Classification**: TF-IDF vector space, domain knowledge ontologies, and Multinomial Naive Bayes scoring.
+- **Deep Candidate & Resume Intelligence**: Automated candidate contact extraction, categorized skill matrices across 6 domains, seniority level badges, and interactive live Job Description compatibility matcher.
 - **TextRank Extractive Summarization**: Graph centrality sentence ranking for executive summaries and key takeaway points.
 - **Tabular Intelligence & Formula Engine**: Automatic spreadsheet matrix parsing, statistical profiling (IQR, correlations, means), and formula evaluation.
 - **Quality & Anomaly Detection**: Proactive identification of empty files, character corruption, repetition loops, and numeric outliers.
-- **Faceted Search Studio**: Full-text inverted index with regex keyword snippet highlighting across titles, text, and metadata.
+- **Faceted Search Studio**: Full-text inverted index with regex keyword snippet highlighting across titles, text, and metadata for both standard users and administrators.
 - **Multi-Format Analysis Exporters**: Instant report generation in **HTML, PDF (ReportLab), JSON, and CSV**.
 - **Role-Based Access Control (RBAC)**: Unified login portal with dual roles:
-  - **Standard User**: Upload, inspect, analyze, search, and export documents.
-  - **System Admin**: User account directory, global document explorer, background job monitor, audit logs, and telemetry.
+  - **Standard User**: Upload, inspect, analyze, search, edit, delete, and export documents.
+  - **System Admin**: User account directory, global document explorer, edit & delete controls, background job monitor, audit logs, and global cross-user Search Studio.
 
 ---
 
@@ -44,21 +59,25 @@ project-12/
 │   ├── schemas/                 # Pydantic v2 Request/Response Schemas
 │   ├── services/                # Business Logic & NLP Algorithms
 │   │   ├── extractors/          # PDF, DOCX, TXT, CSV, XLSX Parsers
-│   │   ├── nlp/                 # Classifier, Summarizer, Keywords, NER, Readability
+│   │   ├── nlp/                 # Classifier, Summarizer, Keywords, NER, Readability, Resume Analyzer
 │   │   ├── queue/               # Asynchronous Background Worker Pool & DLQ
 │   │   ├── reports/             # Multi-Format Report Generators (HTML/PDF/JSON/CSV)
 │   │   ├── search/              # Inverted Index & Snippet Highlighter
 │   │   ├── storage/             # File Storage & Magic Byte Validator
 │   │   ├── audit_service.py     # Immutable Security Audit Logger
-│   │   ├── document_service.py  # Document Lifecycle Management
+│   │   ├── document_service.py  # Document Lifecycle Management (CRUD)
 │   │   └── user_service.py      # User Registration & Identity Services
-│   ├── static/                  # Responsive Blue CSS Stylesheets, JS & Accessible SVG Icons
+│   ├── static/                  # Responsive Orange/Crimson CSS, JS & Accessible SVG Icons
 │   └── templates/               # Jinja2 HTML Templates (User & Admin Portals)
 ├── docs/                        # Complete Architectural & Technical Specs
-├── sample_documents/            # Functional Sample Test Documents (PDF, DOCX, TXT, CSV, XLSX)
 ├── tests/                       # Automated Test Suite (Unit, Integration, E2E)
 ├── measure.py                   # Automated Compliance & Metric Verification Tool
-├── run.py                       # Application Server Launcher
+├── main.py                      # Production Application Entrypoint
+├── app.py                       # Root Compatibility Alias
+├── Dockerfile                   # Multi-stage Container Build
+├── docker-compose.yml           # Multi-Container Compose Architecture
+├── Makefile                     # Build & Test Automation
+├── example.env                  # Environment Variables Template
 ├── requirements.txt             # Production Dependencies Lockfile
 ├── package.json                 # Project Metadata
 ├── package-lock.json            # NPM Lockfile
@@ -85,7 +104,7 @@ pip install -r requirements.txt
 
 ### 2. Launch Application
 ```bash
-python run.py
+python main.py
 ```
 Open your browser at **http://127.0.0.1:8000** to access the unified login portal.
 
@@ -100,18 +119,14 @@ Open your browser at **http://127.0.0.1:8000** to access the unified login porta
 
 ---
 
-## 🧪 Running Automated Tests
+## 🧪 Automated Testing & Verification
 
-Execute the comprehensive automated test suite:
+Run the entire automated test suite:
 ```bash
-python -m pytest tests/ -v
+pytest tests/ -v
 ```
 
----
-
-## 📊 Compliance Verification
-
-Run the autonomous project verification suite:
+Run the 14-point TrainPlex & production compliance scorecard:
 ```bash
 python measure.py
 ```
