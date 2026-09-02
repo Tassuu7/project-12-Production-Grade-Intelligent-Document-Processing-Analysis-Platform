@@ -1,4 +1,5 @@
 """Authentication Endpoints."""
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 from app.core.database import get_db
@@ -7,7 +8,7 @@ from app.models.user import User
 from app.schemas.user import UserRegister, UserLogin, TokenResponse, UserResponse
 from app.services.user_service import UserService
 from app.services.audit_service import AuditService
-from app.api.dependencies import get_current_user
+from app.api.dependencies import get_current_user, get_current_user_optional
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -38,7 +39,8 @@ def login(req: UserLogin, response: Response, db: Session = Depends(get_db)):
         value=token,
         httponly=True,
         samesite="lax",
-        max_age=28800
+        max_age=28800,
+        path="/"
     )
     
     AuditService.log_event(db, "USER_LOGIN", "AUTH", user_id=user.id)
@@ -48,6 +50,13 @@ def login(req: UserLogin, response: Response, db: Session = Depends(get_db)):
         refresh_token=refresh_token,
         user=UserResponse.model_validate(user)
     )
+
+@router.post("/logout")
+def logout(response: Response, user: Optional[User] = Depends(get_current_user_optional), db: Session = Depends(get_db)):
+    if user:
+        AuditService.log_event(db, "USER_LOGOUT", "AUTH", user_id=user.id)
+    response.delete_cookie(key="doc_intel_session", path="/")
+    return {"message": "Successfully logged out."}
 
 @router.get("/me", response_model=UserResponse)
 def get_me(user: User = Depends(get_current_user)):

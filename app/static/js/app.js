@@ -16,7 +16,7 @@ const API = {
         try {
             const response = await fetch(url, { ...options, headers });
             
-            if (response.status === 401 && !url.includes('/auth/login')) {
+            if (response.status === 401 && !url.includes('/auth/login') && !url.includes('/auth/register')) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 window.location.href = '/login';
@@ -39,10 +39,15 @@ const API = {
         return u ? JSON.parse(u) : null;
     },
 
-    logout() {
+    async logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        try {
+            await fetch('/api/v1/auth/logout', { method: 'POST' });
+        } catch (e) {
+            console.error('Logout error:', e);
+        }
+        window.location.href = '/logout';
     }
 };
 

@@ -1,4 +1,4 @@
-/* Authentication & Unified Login Logic */
+/* Authentication & Unified Login/Register Logic */
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
@@ -10,21 +10,27 @@ document.addEventListener('DOMContentLoaded', () => {
         tabLogin.addEventListener('click', () => {
             tabLogin.classList.add('active');
             tabRegister.classList.remove('active');
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
+            if (loginForm) loginForm.style.display = 'block';
+            if (registerForm) registerForm.style.display = 'none';
         });
 
         tabRegister.addEventListener('click', () => {
             tabRegister.classList.add('active');
             tabLogin.classList.remove('active');
-            registerForm.style.display = 'block';
-            loginForm.style.display = 'none';
+            if (registerForm) registerForm.style.display = 'block';
+            if (loginForm) loginForm.style.display = 'none';
         });
     }
 
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Signing in...';
+            }
+
             const usernameOrEmail = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value;
 
@@ -45,10 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             window.location.href = '/dashboard';
                         }
-                    }, 500);
+                    }, 400);
                 }
             } catch (err) {
-                showToast(err.message, 'error');
+                showToast(err.message || 'Invalid credentials', 'error');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Sign In';
+                }
             }
         });
     }
@@ -56,6 +66,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const submitBtn = registerForm.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Creating account...';
+            }
+
             const fullName = document.getElementById('reg-fullname').value.trim();
             const email = document.getElementById('reg-email').value.trim();
             const username = document.getElementById('reg-username').value.trim();
@@ -66,10 +82,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     body: JSON.stringify({ full_name: fullName, email, username, password })
                 });
-                showToast('Registration successful! Please log in.', 'success');
-                tabLogin.click();
+                
+                showToast('Registration successful! Logging you in...', 'success');
+                
+                // Automatically log in newly registered user
+                const loginRes = await API.request('/api/v1/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username_or_email: username, password })
+                });
+
+                if (loginRes && loginRes.access_token) {
+                    localStorage.setItem('token', loginRes.access_token);
+                    localStorage.setItem('user', JSON.stringify(loginRes.user));
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 400);
+                } else {
+                    tabLogin.click();
+                    document.getElementById('login-username').value = username;
+                }
             } catch (err) {
-                showToast(err.message, 'error');
+                showToast(err.message || 'Registration failed', 'error');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Create Account';
+                }
             }
         });
     }

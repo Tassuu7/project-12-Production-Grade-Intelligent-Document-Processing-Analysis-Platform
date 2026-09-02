@@ -69,6 +69,12 @@ def login_page(request: Request, user: User = Depends(get_current_user_optional)
         return RedirectResponse(url="/admin/dashboard" if user.role == "admin" else "/dashboard")
     return templates.TemplateResponse(request=request, name="login.html", context={})
 
+@app.get("/logout")
+def logout_endpoint():
+    response = RedirectResponse(url="/login", status_code=303)
+    response.delete_cookie(key="doc_intel_session", path="/")
+    return response
+
 @app.get("/dashboard", response_class=HTMLResponse)
 def user_dashboard(request: Request, user: User = Depends(get_current_user_optional), db: Session = Depends(get_db)):
     if not user:

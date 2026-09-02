@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/static/css/components.css">
     <link rel="stylesheet" href="/static/css/dashboard.css">
     <link rel="stylesheet" href="/static/css/document_viewer.css">
+    <link rel="stylesheet" href="/static/css/reports.css">
+    <link rel="stylesheet" href="/static/css/tables.css">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -21,17 +23,17 @@
             <ul class="nav-links">
                 {% if is_admin %}
                 <li><a href="/admin/dashboard" class="nav-item {% if active_page == 'admin_dash' %}active{% endif %}">Admin Overview</a></li>
-                <li><a href="/admin/users" class="nav-item {% if active_page == 'admin_users' %}active{% endif %}">Users</a></li>
+                <li><a href="/admin/users" class="nav-item {% if active_page == 'admin_users' %}active{% endif %}">User Directory</a></li>
                 <li><a href="/admin/documents" class="nav-item {% if active_page == 'admin_docs' %}active{% endif %}">All Documents</a></li>
-                <li><a href="/admin/jobs" class="nav-item {% if active_page == 'admin_jobs' %}active{% endif %}">Processing Jobs</a></li>
+                <li><a href="/admin/jobs" class="nav-item {% if active_page == 'admin_jobs' %}active{% endif %}">Job Monitor</a></li>
                 <li><a href="/admin/audit-logs" class="nav-item {% if active_page == 'admin_audit' %}active{% endif %}">Audit Logs</a></li>
-                <li><a href="/admin/health" class="nav-item {% if active_page == 'admin_health' %}active{% endif %}">Health & Settings</a></li>
+                <li><a href="/admin/health" class="nav-item {% if active_page == 'admin_health' %}active{% endif %}">Health & Telemetry</a></li>
                 {% else %}
                 <li><a href="/dashboard" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a></li>
                 <li><a href="/upload" class="nav-item {% if active_page == 'upload' %}active{% endif %}">Upload Documents</a></li>
                 <li><a href="/documents" class="nav-item {% if active_page == 'documents' %}active{% endif %}">My Documents</a></li>
                 <li><a href="/search" class="nav-item {% if active_page == 'search' %}active{% endif %}">Search Studio</a></li>
-                <li><a href="/reports" class="nav-item {% if active_page == 'reports' %}active{% endif %}">Reports</a></li>
+                <li><a href="/reports" class="nav-item {% if active_page == 'reports' %}active{% endif %}">Reports Studio</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -39,7 +41,7 @@
         <div class="user-profile-menu">
             <span class="role-badge {{ 'admin' if is_admin else 'user' }}">{{ 'ADMIN' if is_admin else 'USER' }}</span>
             <span style="font-weight: 600; color: var(--slate-700);">{{ user.full_name if user else 'Account' }}</span>
-            <button class="btn btn-sm btn-secondary" onclick="API.logout()">Logout</button>
+            <a href="/logout" class="btn btn-sm btn-secondary" onclick="API.logout(); return false;">Logout</a>
         </div>
     </header>
 
