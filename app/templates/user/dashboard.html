@@ -17,7 +17,7 @@
 <!-- Stats Grid -->
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-icon blue">
+        <div class="stat-icon orange">
             <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; stroke: currentColor;"><use href="/static/icons/icons.svg#icon-document"></use></svg>
         </div>
         <div>
@@ -44,7 +44,7 @@
         </div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon blue">
+        <div class="stat-icon orange">
             <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; stroke: currentColor;"><use href="/static/icons/icons.svg#icon-server"></use></svg>
         </div>
         <div>
@@ -77,12 +77,12 @@
                     {% for doc in recent_docs %}
                     <tr id="doc-row-{{ doc.id }}">
                         <td>
-                            <strong><a href="/documents/{{ doc.id }}" style="color: #1e40af; text-decoration: none;">{{ doc.title }}</a></strong>
+                            <strong><a href="/documents/{{ doc.id }}" style="color: #dc2626; text-decoration: none;">{{ doc.title }}</a></strong>
                             <div style="font-size: 0.8rem; color: var(--slate-400);">{{ doc.original_filename }}</div>
                         </td>
                         <td><span class="badge" style="background: var(--slate-100);">{{ doc.file_type | upper }}</span></td>
                         <td>
-                            <span class="badge" style="background: #eff6ff; color: #1e40af; font-weight: 600;">
+                            <span class="badge" style="background: #fff7ed; color: #ea580c; font-weight: 600; border: 1px solid #fed7aa;">
                                 {{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else 'General') }}
                             </span>
                         </td>
@@ -144,9 +144,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     initUploader('quick-dropzone', 'quick-file-input', 'quick-file-list', 'quick-upload-btn');
     
-    // Dynamic Category Chart from Real Uploaded Documents
     const catCounts = {{ category_counts | tojson | safe }};
-    const palette = ['#1e40af', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b', '#3b82f6'];
+    const palette = ['#ea580c', '#dc2626', '#b91c1c', '#f59e0b', '#7c2d12', '#991b1b', '#d97706'];
     
     const catData = Object.keys(catCounts).map((k, idx) => ({
         label: k,
@@ -155,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }));
 
     if (catData.length === 0) {
-        catData.push({ label: 'No Documents', value: 1, color: '#e2e8f0' });
+        catData.push({ label: 'No Documents', value: 1, color: '#e4e4e7' });
     }
 
     renderDonutChart('category-chart', catData);
@@ -166,8 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
         catData.forEach(item => {
             const el = document.createElement('span');
             el.className = 'badge';
-            el.style.backgroundColor = '#f8fafc';
-            el.style.color = '#1e293b';
+            el.style.backgroundColor = '#fff7ed';
+            el.style.color = '#7c2d12';
             el.style.border = `1px solid ${item.color}`;
             el.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${item.color}; margin-right:4px;"></span> ${item.label} (${item.value})`;
             legend.appendChild(el);

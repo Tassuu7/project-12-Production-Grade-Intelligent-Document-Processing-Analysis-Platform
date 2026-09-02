@@ -1,17 +1,17 @@
-/* Unified Authentication Styles */
+/* Flame Orange / Ruby Red Authentication Styles */
 .auth-wrapper {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-800) 50%, var(--primary-950, #0c1a30) 100%);
+    background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 40%, #ea580c 100%);
     padding: 2rem 1rem;
 }
 
 .auth-card {
     background: #ffffff;
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 25px 50px -12px rgba(153, 27, 27, 0.35);
     width: 100%;
     max-width: 460px;
     padding: 2.5rem;
@@ -22,11 +22,17 @@
     margin-bottom: 2rem;
 }
 
-.auth-logo {
-    width: 48px;
-    height: 48px;
-    color: var(--primary-600);
-    margin-bottom: 0.75rem;
+.auth-logo-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ea580c 0%, #dc2626 50%, #991b1b 100%);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+    color: #ffffff;
+    margin-bottom: 1rem;
 }
 
 .auth-tabs {
@@ -53,6 +59,7 @@
 
 .auth-tab-btn.active {
     background: #ffffff;
-    color: var(--primary-800);
+    color: #b91c1c;
+    font-weight: 700;
     box-shadow: var(--shadow-sm);
 }

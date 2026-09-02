@@ -17,22 +17,22 @@
 </div>
 
 {% if resume_data and resume_data.is_resume %}
-<!-- SPECIAL RESUME & JOB ANALYSIS INTELLIGENCE PANEL -->
-<div class="card" style="margin-bottom: 2rem; border-left: 5px solid #1e40af; background: linear-gradient(to right, #ffffff, #f8fafc);">
-    <div class="card-header" style="border-bottom: 1px solid var(--slate-200); padding-bottom: 1rem;">
+<!-- SPECIAL RESUME & JOB ANALYSIS INTELLIGENCE PANEL (ORANGE/CRIMSON) -->
+<div class="card" style="margin-bottom: 2rem; border-left: 5px solid #dc2626; background: linear-gradient(to right, #ffffff, #fff7ed);">
+    <div class="card-header" style="border-bottom: 1px solid #fed7aa; padding-bottom: 1rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div>
-                <span class="badge" style="background: #1e40af; color: #ffffff; font-size: 0.85rem; padding: 0.35rem 0.75rem;">🎯 RESUME & CANDIDATE INTELLIGENCE</span>
+                <span class="badge" style="background: #dc2626; color: #ffffff; font-size: 0.85rem; padding: 0.35rem 0.75rem;">🎯 RESUME & CANDIDATE INTELLIGENCE</span>
                 <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--slate-900); margin-top: 0.5rem;">{{ resume_data.candidate_profile.name }}</h2>
                 <div style="color: var(--slate-600); font-size: 0.9rem; margin-top: 0.25rem;">
                     {% if resume_data.candidate_profile.email %}<span>📧 {{ resume_data.candidate_profile.email }}</span> &nbsp;|&nbsp; {% endif %}
                     {% if resume_data.candidate_profile.phone %}<span>📱 {{ resume_data.candidate_profile.phone }}</span> &nbsp;|&nbsp; {% endif %}
-                    {% if resume_data.candidate_profile.linkedin %}<span>🔗 <a href="{{ resume_data.candidate_profile.linkedin }}" target="_blank">LinkedIn</a></span> &nbsp;|&nbsp; {% endif %}
-                    {% if resume_data.candidate_profile.github %}<span>🐙 <a href="{{ resume_data.candidate_profile.github }}" target="_blank">GitHub</a></span>{% endif %}
+                    {% if resume_data.candidate_profile.linkedin %}<span>🔗 <a href="{{ resume_data.candidate_profile.linkedin }}" target="_blank" style="color: #ea580c;">LinkedIn</a></span> &nbsp;|&nbsp; {% endif %}
+                    {% if resume_data.candidate_profile.github %}<span>🐙 <a href="{{ resume_data.candidate_profile.github }}" target="_blank" style="color: #ea580c;">GitHub</a></span>{% endif %}
                 </div>
             </div>
             <div style="text-align: right;">
-                <div style="font-size: 2.25rem; font-weight: 900; color: #1e40af;">{{ resume_data.top_match_score }}%</div>
+                <div style="font-size: 2.25rem; font-weight: 900; color: #dc2626;">{{ resume_data.top_match_score }}%</div>
                 <div style="font-size: 0.8rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Top Role Match Score</div>
                 <span class="badge" style="background: {{ resume_data.experience_summary.badge_color }}; color: white; margin-top: 0.25rem;">
                     {{ resume_data.experience_summary.seniority_level }} (~{{ resume_data.experience_summary.estimated_years }} yrs)
@@ -42,17 +42,17 @@
     </div>
 
     <!-- Interactive Custom Job Description Matcher -->
-    <div style="padding: 1.25rem 0; border-bottom: 1px solid var(--slate-100); background: #f0f9ff; margin: 0 -1.5rem; padding: 1.25rem 1.5rem;">
-        <h3 style="font-size: 1.1rem; font-weight: 700; color: #0369a1; margin-bottom: 0.5rem;">🎯 Live Job Description Fit Matcher</h3>
+    <div style="padding: 1.25rem 0; border-bottom: 1px solid #fed7aa; background: #fff7ed; margin: 0 -1.5rem; padding: 1.25rem 1.5rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #9a3412; margin-bottom: 0.5rem;">🎯 Live Job Description Fit Matcher</h3>
         <p style="font-size: 0.85rem; color: var(--slate-600); margin-bottom: 0.75rem;">Paste any specific Job Description below to calculate instant candidate fit percentage and matching skill breakdown:</p>
         <div style="display: flex; gap: 0.75rem;">
             <textarea id="jd-input" class="input-field" rows="3" style="flex: 1; font-size: 0.85rem;" placeholder="e.g. We are looking for a Senior Python Developer with experience in FastAPI, Docker, PostgreSQL, and AWS..."></textarea>
             <button type="button" class="btn btn-primary" onclick="calculateJDScore()" style="align-self: flex-start; padding: 0.75rem 1.25rem;">Calculate Match</button>
         </div>
-        <div id="jd-result" style="display: none; margin-top: 1rem; padding: 1rem; background: #ffffff; border-radius: 6px; border: 1px solid #bae6fd;">
+        <div id="jd-result" style="display: none; margin-top: 1rem; padding: 1rem; background: #ffffff; border-radius: 6px; border: 1px solid #fed7aa;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                 <strong style="color: var(--slate-800);">Job Description Compatibility:</strong>
-                <span id="jd-score-badge" style="font-size: 1.25rem; font-weight: 900; color: #0284c7;">85%</span>
+                <span id="jd-score-badge" style="font-size: 1.25rem; font-weight: 900; color: #ea580c;">85%</span>
             </div>
             <div id="jd-matched-skills" style="font-size: 0.85rem; color: var(--slate-700); margin-bottom: 0.25rem;"></div>
             <div id="jd-missing-skills" style="font-size: 0.85rem; color: var(--slate-500);"></div>
@@ -65,10 +65,10 @@
         <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--slate-800); margin-bottom: 0.75rem;">💼 Automatic Role Fit Rankings</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
             {% for match in resume_data.role_matches %}
-            <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 8px; padding: 1rem;">
+            <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 1rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                     <strong style="color: var(--slate-800); font-size: 0.95rem;">{{ match.role }}</strong>
-                    <span style="font-weight: 800; color: #1e40af;">{{ match.match_score }}%</span>
+                    <span style="font-weight: 800; color: #dc2626;">{{ match.match_score }}%</span>
                 </div>
                 <div style="font-size: 0.8rem; color: var(--slate-600); margin-bottom: 0.5rem;">
                     <strong>Matching Skills:</strong> {{ match.matched_skills|join(', ') if match.matched_skills else 'Domain alignment' }}
@@ -90,11 +90,11 @@
         <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--slate-800); margin-bottom: 0.75rem;">🛠️ Extracted Technical & Domain Skills ({{ resume_data.total_skills_count }})</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
             {% for cat_name, skills in resume_data.skills_matrix.items() %}
-            <div style="background: #ffffff; border: 1px solid var(--slate-200); border-radius: 6px; padding: 0.75rem;">
-                <div style="font-size: 0.8rem; font-weight: 700; color: var(--slate-600); text-transform: uppercase; margin-bottom: 0.5rem;">{{ cat_name }}</div>
+            <div style="background: #ffffff; border: 1px solid #fed7aa; border-radius: 6px; padding: 0.75rem;">
+                <div style="font-size: 0.8rem; font-weight: 700; color: #9a3412; text-transform: uppercase; margin-bottom: 0.5rem;">{{ cat_name }}</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
                     {% for s in skills %}
-                    <span class="badge" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; font-size: 0.75rem;">{{ s }}</span>
+                    <span class="badge" style="background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; font-size: 0.75rem;">{{ s }}</span>
                     {% endfor %}
                 </div>
             </div>
@@ -120,7 +120,7 @@
 <!-- Standard Document Analytics Section -->
 <div class="stats-grid" style="margin-bottom: 1.5rem;">
     <div class="stat-card">
-        <div class="stat-icon blue">
+        <div class="stat-icon orange">
             <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; stroke: currentColor;"><use href="/static/icons/icons.svg#icon-document"></use></svg>
         </div>
         <div>
@@ -186,7 +186,7 @@
             <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                 {% if keywords %}
                     {% for kw in keywords %}
-                    <span class="badge" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 0.35rem 0.65rem; font-size: 0.85rem;">
+                    <span class="badge" style="background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; padding: 0.35rem 0.65rem; font-size: 0.85rem;">
                         {{ kw.term }} ({{ (kw.score * 100)|round(0)|int }}%)
                     </span>
                     {% endfor %}
@@ -205,7 +205,7 @@
                     {% for sim in similar_docs %}
                     <li style="padding: 0.75rem 0; border-bottom: 1px solid var(--slate-100); display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <a href="/documents/{{ sim.target_id }}" style="font-weight: 600; color: #1e40af; text-decoration: none;">{{ sim.title }}</a>
+                            <a href="/documents/{{ sim.target_id }}" style="font-weight: 600; color: #dc2626; text-decoration: none;">{{ sim.title }}</a>
                             <div style="font-size: 0.75rem; color: var(--slate-500);">Shared terms: {{ sim.shared_terms|join(', ') }}</div>
                         </div>
                         <span class="badge badge-completed">{{ (sim.score * 100)|round(1) }}% Match</span>
@@ -229,7 +229,6 @@ function calculateJDScore() {
         return;
     }
     
-    // Extract candidate skills from rendered page
     const skillBadges = Array.from(document.querySelectorAll('.card span.badge')).map(el => el.innerText.trim().toLowerCase());
     const matched = [];
     const keywords = ['python', 'javascript', 'typescript', 'react', 'fastapi', 'django', 'aws', 'docker', 'kubernetes', 'sql', 'postgresql', 'mongodb', 'git', 'linux', 'ci/cd', 'machine learning', 'pytorch', 'tensorflow', 'rest api'];

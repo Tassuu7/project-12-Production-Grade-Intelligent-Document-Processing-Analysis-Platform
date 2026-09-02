@@ -3,20 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Intelligent Document Processing Platform</title>
+    <title>Nexus DocIntel - Enterprise Login</title>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/components.css">
     <link rel="stylesheet" href="/static/css/auth.css">
+    <style>
+        .brand-title-gradient {
+            background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 40%, #ea580c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+    </style>
 </head>
 <body>
     <div class="auth-wrapper">
         <div class="auth-card">
             <div class="auth-header">
                 <div style="display: flex; justify-content: center;">
-                    <svg class="auth-logo" viewBox="0 0 24 24"><use href="/static/icons/icons.svg#icon-document"></use></svg>
+                    <div class="auth-logo-badge">
+                        <svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    </div>
                 </div>
-                <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--slate-900);">Nexus DocIntel</h1>
-                <p style="color: var(--slate-500); font-size: 0.9rem; margin-top: 0.35rem;">
+                <h1 class="brand-title-gradient">Nexus DocIntel</h1>
+                <p style="color: var(--slate-600); font-size: 0.9rem; margin-top: 0.35rem; font-weight: 500;">
                     Single Unified Portal for Users & Administrators
                 </p>
             </div>
@@ -39,7 +51,7 @@
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
                     Sign In
                 </button>
-                <div style="margin-top: 1.5rem; background: var(--primary-50); border: 1px solid var(--primary-200); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.8rem; color: var(--primary-900);">
+                <div style="margin-top: 1.5rem; background: #fff7ed; border: 1px solid #fed7aa; border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.8rem; color: #9a3412;">
                     <strong>Default Credentials:</strong><br>
                     • Admin: <code>admin@test.com</code> / <code>Admin@12345</code><br>
                     • User: <code>user@test.com</code> / <code>User@12345</code>

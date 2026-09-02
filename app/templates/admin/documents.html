@@ -32,12 +32,12 @@
                         <div style="font-size: 0.75rem; color: var(--slate-400);">{{ doc.owner.email if doc.owner else '' }}</div>
                     </td>
                     <td>
-                        <strong><a href="/documents/{{ doc.id }}" style="color: #1e40af; text-decoration: none;">{{ doc.title }}</a></strong>
+                        <strong><a href="/documents/{{ doc.id }}" style="color: #dc2626; text-decoration: none;">{{ doc.title }}</a></strong>
                         <div style="font-size: 0.8rem; color: var(--slate-400);">{{ doc.original_filename }} ({{ (doc.file_size_bytes / 1024)|round(1) }} KB)</div>
                     </td>
                     <td><span class="badge" style="background: var(--slate-100);">{{ doc.file_type | upper }}</span></td>
                     <td>
-                        <span class="badge" style="background: #eff6ff; color: #1e40af; font-weight: 600;">
+                        <span class="badge" style="background: #fff7ed; color: #ea580c; font-weight: 600; border: 1px solid #fed7aa;">
                             {{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else 'General Document') }}
                         </span>
                     </td>

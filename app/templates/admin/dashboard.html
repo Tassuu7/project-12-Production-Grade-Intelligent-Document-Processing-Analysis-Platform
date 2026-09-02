@@ -15,7 +15,7 @@
 
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-icon blue">
+        <div class="stat-icon orange">
             <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; stroke: currentColor;"><use href="/static/icons/icons.svg#icon-document"></use></svg>
         </div>
         <div>
@@ -72,15 +72,15 @@
                 <tr>
                     <td>
                         {% if log.action == 'USER_LOGIN' %}
-                        <span class="badge" style="background: #eff6ff; color: #1e40af; font-weight: 600;">🔑 User Login</span>
+                        <span class="badge" style="background: #fff7ed; color: #c2410c; font-weight: 600;">🔑 User Login</span>
                         {% elif log.action == 'USER_LOGOUT' %}
-                        <span class="badge" style="background: #f8fafc; color: #475569; font-weight: 600;">🚪 User Logout</span>
+                        <span class="badge" style="background: #f4f4f5; color: #52525b; font-weight: 600;">🚪 User Logout</span>
                         {% elif log.action == 'USER_REGISTER' %}
                         <span class="badge" style="background: #ecfdf5; color: #065f46; font-weight: 600;">👤 Account Created</span>
                         {% elif log.action == 'DOCUMENT_UPLOAD' %}
-                        <span class="badge" style="background: #f0fdf4; color: #166534; font-weight: 600;">📄 Document Upload</span>
+                        <span class="badge" style="background: #fff7ed; color: #ea580c; font-weight: 600;">📄 Document Upload</span>
                         {% elif log.action == 'DOCUMENT_DELETE' %}
-                        <span class="badge" style="background: #fef2f2; color: #991b1b; font-weight: 600;">🗑️ Document Deleted</span>
+                        <span class="badge" style="background: #fef2f2; color: #dc2626; font-weight: 600;">🗑️ Document Deleted</span>
                         {% else %}
                         <span class="badge badge-completed">{{ log.action }}</span>
                         {% endif %}

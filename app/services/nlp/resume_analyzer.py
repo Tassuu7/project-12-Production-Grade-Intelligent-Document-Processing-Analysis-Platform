@@ -165,16 +165,16 @@ class ResumeJobAnalyzer:
 
         if exp_years >= 7:
             seniority = "Lead / Principal Engineer"
-            badge_color = "#7c3aed"
+            badge_color = "#991b1b"
         elif exp_years >= 4:
             seniority = "Senior Engineer"
-            badge_color = "#1e40af"
+            badge_color = "#dc2626"
         elif exp_years >= 2:
             seniority = "Mid-Level Engineer"
-            badge_color = "#059669"
+            badge_color = "#ea580c"
         else:
             seniority = "Junior / Associate Engineer"
-            badge_color = "#2563eb"
+            badge_color = "#f97316"
 
         return {
             "estimated_years": exp_years,

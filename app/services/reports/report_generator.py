@@ -42,7 +42,7 @@ class ReportGenerator:
         topics = json.loads(res.topics_json) if res and res.topics_json else []
         anomalies = json.loads(res.anomaly_findings_json) if res and res.anomaly_findings_json else []
         
-        kw_html = "".join([f"<span style='display:inline-block; background:#eff6ff; color:#1e40af; padding:4px 10px; border-radius:12px; margin:3px; font-size:12px; font-weight:600;'>{k.get('term')}</span>" for k in keywords])
+        kw_html = "".join([f"<span style='display:inline-block; background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; padding:4px 10px; border-radius:12px; margin:3px; font-size:12px; font-weight:600;'>{k.get('term')}</span>" for k in keywords])
         topic_html = "".join([f"<li style='margin-bottom:6px;'><strong>{t.get('name')}</strong> - Terms: {', '.join(t.get('top_terms', []))}</li>" for t in topics])
         anomaly_html = "".join([f"<div style='background:#fef2f2; border:1px solid #fecaca; padding:10px; border-radius:6px; margin-bottom:8px;'><strong>[{a.get('severity')}] {a.get('type')}</strong>: {a.get('description')}</div>" for a in anomalies]) or "<p style='color:#15803d;'>No anomalies detected.</p>"
 
@@ -52,12 +52,12 @@ class ReportGenerator:
     <meta charset="utf-8">
     <title>Document Analysis Report - {doc.title}</title>
     <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #1e293b; line-height: 1.6; max-width: 860px; margin: 0 auto; }}
-        h1 {{ color: #1e40af; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; }}
-        h2 {{ color: #1e3a8a; margin-top: 25px; }}
-        .card {{ background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 20px; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #18181b; line-height: 1.6; max-width: 860px; margin: 0 auto; }}
+        h1 {{ color: #dc2626; border-bottom: 2px solid #ea580c; padding-bottom: 10px; }}
+        h2 {{ color: #991b1b; margin-top: 25px; }}
+        .card {{ background: #fbfbfb; border: 1px solid #e4e4e7; border-radius: 8px; padding: 18px; margin-bottom: 20px; }}
         .metric-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }}
-        .metric-box {{ background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; text-align: center; }}
+        .metric-box {{ background: #ffffff; border: 1px solid #d4d4d8; border-radius: 6px; padding: 12px; text-align: center; }}
     </style>
 </head>
 <body>
@@ -116,8 +116,8 @@ class ReportGenerator:
         pdf = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
         
         styles = getSampleStyleSheet()
-        title_style = ParagraphStyle('ReportTitle', parent=styles['Heading1'], fontSize=20, textColor=colors.HexColor("#1e40af"), spaceAfter=12)
-        h2_style = ParagraphStyle('ReportH2', parent=styles['Heading2'], fontSize=14, textColor=colors.HexColor("#1e3a8a"), spaceBefore=14, spaceAfter=8)
+        title_style = ParagraphStyle('ReportTitle', parent=styles['Heading1'], fontSize=20, textColor=colors.HexColor("#dc2626"), spaceAfter=12)
+        h2_style = ParagraphStyle('ReportH2', parent=styles['Heading2'], fontSize=14, textColor=colors.HexColor("#991b1b"), spaceBefore=14, spaceAfter=8)
         body_style = styles['BodyText']
         
         story = []
