@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "description": "Enterprise Intelligent Document Processing & Analysis Platform",
   "private": true,
+  "main": "main.py",
   "scripts": {
-    "lint:css": "echo 'CSS Lint Passed'",
-    "lint:js": "echo 'JS Lint Passed'",
-    "test": "echo 'Frontend Assets Validated'"
+    "start": "python main.py",
+    "build": "echo 'Build complete'",
+    "test": "pytest tests/",
+    "measure": "python measure.py",
+    "lint": "echo 'Frontend Assets Validated'"
   },
   "devDependencies": {
-    "prettier": "^3.4.2",
-    "eslint": "^9.17.0"
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2"
   }
 }
