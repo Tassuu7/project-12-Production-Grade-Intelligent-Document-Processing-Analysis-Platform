@@ -6,9 +6,12 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">My Documents Repository</h1>
-        <p class="page-subtitle">View, search, filter, and inspect all your uploaded and analyzed documents.</p>
+        <p class="page-subtitle">View, search, filter, edit, and inspect all your uploaded and analyzed documents.</p>
     </div>
-    <a href="/upload" class="btn btn-primary">+ Upload Documents</a>
+    <div style="display: flex; gap: 0.5rem;">
+        <a href="/upload" class="btn btn-primary">+ Upload Documents</a>
+        <a href="/search" class="btn btn-secondary">Search Studio</a>
+    </div>
 </div>
 
 <div class="card">
@@ -16,11 +19,10 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Title</th>
+                    <th>Title & File</th>
                     <th>Format</th>
                     <th>Pages / Words</th>
                     <th>Classification</th>
-                    <th>Confidence</th>
                     <th>Status</th>
                     <th>Uploaded</th>
                     <th>Actions</th>
@@ -28,37 +30,31 @@
             </thead>
             <tbody>
                 {% for doc in documents %}
-                <tr>
+                <tr id="doc-row-{{ doc.id }}">
                     <td>
-                        <strong><a href="/documents/{{ doc.id }}">{{ doc.title }}</a></strong>
-                        <div style="font-size: 0.8rem; color: var(--slate-400);">{{ doc.original_filename }}</div>
+                        <strong><a href="/documents/{{ doc.id }}" style="color: #1e40af; text-decoration: none;">{{ doc.title }}</a></strong>
+                        <div style="font-size: 0.8rem; color: var(--slate-400);">{{ doc.original_filename }} ({{ (doc.file_size_bytes / 1024)|round(1) }} KB)</div>
                     </td>
                     <td><span class="badge" style="background: var(--slate-100);">{{ doc.file_type | upper }}</span></td>
                     <td>{{ doc.page_count }} p / {{ doc.word_count }} w</td>
                     <td>
-                        {% if doc.analysis_result %}
-                        <span class="badge" style="background: var(--primary-50); color: var(--primary-700);">
-                            {{ doc.analysis_result.category_predicted }}
+                        <span class="badge" style="background: #eff6ff; color: #1e40af; font-weight: 600;">
+                            {{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else 'General') }}
                         </span>
-                        {% else %}-{% endif %}
-                    </td>
-                    <td>
-                        {% if doc.analysis_result %}
-                        <strong>{{ (doc.analysis_result.category_confidence * 100) | round(1) }}%</strong>
-                        {% else %}-{% endif %}
                     </td>
                     <td><span class="badge badge-{{ doc.status }}">{{ doc.status }}</span></td>
-                    <td>{{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="local-timestamp" data-utc="{{ doc.created_at.isoformat() if doc.created_at else '' }}">{{ doc.created_at.strftime('%Y-%m-%d %I:%M %p') if doc.created_at else 'Just now' }}</td>
                     <td>
                         <div style="display: flex; gap: 0.35rem;">
                             <a href="/documents/{{ doc.id }}" class="btn btn-sm btn-secondary">Inspect</a>
-                            <a href="/api/v1/documents/{{ doc.id }}/download" class="btn btn-sm btn-secondary">Download</a>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="openEditModal({{ doc.id }}, '{{ doc.title }}', '{{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else "") }}')">Edit</button>
+                            <button type="button" class="btn btn-sm btn-secondary" style="color: #dc2626; border-color: #fecaca;" onclick="deleteDocument({{ doc.id }}, '{{ doc.title }}')">Delete</button>
                         </div>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="8" style="text-align: center; padding: 3rem; color: var(--slate-500);">
+                    <td colspan="7" style="text-align: center; padding: 3rem; color: var(--slate-500);">
                         No documents found. <a href="/upload">Upload your first document</a>.
                     </td>
                 </tr>

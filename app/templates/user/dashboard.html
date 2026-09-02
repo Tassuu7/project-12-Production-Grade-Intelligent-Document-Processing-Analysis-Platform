@@ -75,26 +75,26 @@
                 </thead>
                 <tbody>
                     {% for doc in recent_docs %}
-                    <tr>
+                    <tr id="doc-row-{{ doc.id }}">
                         <td>
-                            <strong><a href="/documents/{{ doc.id }}">{{ doc.title }}</a></strong>
+                            <strong><a href="/documents/{{ doc.id }}" style="color: #1e40af; text-decoration: none;">{{ doc.title }}</a></strong>
                             <div style="font-size: 0.8rem; color: var(--slate-400);">{{ doc.original_filename }}</div>
                         </td>
                         <td><span class="badge" style="background: var(--slate-100);">{{ doc.file_type | upper }}</span></td>
                         <td>
-                            {% if doc.category or (doc.analysis_result and doc.analysis_result.category_predicted) %}
-                            <span class="badge" style="background: var(--primary-50); color: var(--primary-700);">
-                                {{ doc.category or doc.analysis_result.category_predicted }}
+                            <span class="badge" style="background: #eff6ff; color: #1e40af; font-weight: 600;">
+                                {{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else 'General') }}
                             </span>
-                            {% else %}
-                            <span style="color: var(--slate-400);">-</span>
-                            {% endif %}
                         </td>
                         <td>
                             <span class="badge badge-{{ doc.status }}">{{ doc.status }}</span>
                         </td>
                         <td>
-                            <a href="/documents/{{ doc.id }}" class="btn btn-sm btn-secondary">Inspect</a>
+                            <div style="display: flex; gap: 0.35rem;">
+                                <a href="/documents/{{ doc.id }}" class="btn btn-sm btn-secondary">Inspect</a>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="openEditModal({{ doc.id }}, '{{ doc.title }}', '{{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else "") }}')">Edit</button>
+                                <button type="button" class="btn btn-sm btn-secondary" style="color: #dc2626; border-color: #fecaca;" onclick="deleteDocument({{ doc.id }}, '{{ doc.title }}')">Delete</button>
+                            </div>
                         </td>
                     </tr>
                     {% else %}
@@ -129,8 +129,9 @@
             <div class="card-header">
                 <h2 class="card-title">Category Distribution</h2>
             </div>
-            <div style="display: flex; justify-content: center; padding: 1rem 0;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem 0;">
                 <canvas id="category-chart" width="220" height="220"></canvas>
+                <div id="category-legend" style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1rem;"></div>
             </div>
         </div>
     </div>
@@ -143,14 +144,35 @@
 document.addEventListener('DOMContentLoaded', () => {
     initUploader('quick-dropzone', 'quick-file-input', 'quick-file-list', 'quick-upload-btn');
     
-    // Render donut chart for categories
-    const catData = [
-        { label: 'Invoices', value: 4, color: '#3b82f6' },
-        { label: 'Resumes', value: 3, color: '#10b981' },
-        { label: 'Reports', value: 5, color: '#f59e0b' },
-        { label: 'Spreadsheets', value: 2, color: '#8b5cf6' }
-    ];
+    // Dynamic Category Chart from Real Uploaded Documents
+    const catCounts = {{ category_counts | tojson | safe }};
+    const palette = ['#1e40af', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b', '#3b82f6'];
+    
+    const catData = Object.keys(catCounts).map((k, idx) => ({
+        label: k,
+        value: catCounts[k],
+        color: palette[idx % palette.length]
+    }));
+
+    if (catData.length === 0) {
+        catData.push({ label: 'No Documents', value: 1, color: '#e2e8f0' });
+    }
+
     renderDonutChart('category-chart', catData);
+
+    const legend = document.getElementById('category-legend');
+    if (legend && Object.keys(catCounts).length > 0) {
+        legend.innerHTML = '';
+        catData.forEach(item => {
+            const el = document.createElement('span');
+            el.className = 'badge';
+            el.style.backgroundColor = '#f8fafc';
+            el.style.color = '#1e293b';
+            el.style.border = `1px solid ${item.color}`;
+            el.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${item.color}; margin-right:4px;"></span> ${item.label} (${item.value})`;
+            legend.appendChild(el);
+        });
+    }
 });
 </script>
 {% endblock %}

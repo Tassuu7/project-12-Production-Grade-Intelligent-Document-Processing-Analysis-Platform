@@ -13,6 +13,7 @@ class Document(Base, TimestampMixin, SoftDeleteMixin):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     title = Column(String(255), nullable=False, index=True)
+    category = Column(String(100), default="General Document", nullable=True, index=True)
     original_filename = Column(String(255), nullable=False)
     stored_filename = Column(String(255), nullable=False, unique=True)
     file_path = Column(String(500), nullable=False)

@@ -88,12 +88,20 @@ def user_dashboard(request: Request, user: User = Depends(get_current_user_optio
         "completed_documents": len([d for d in docs if d.status == "completed"]),
         "processing_documents": len([d for d in docs if d.status in ["queued", "processing"]])
     }
+    
+    # Calculate real dynamic category distribution
+    category_counts = {}
+    for d in docs:
+        cat = d.category or (d.analysis_result.category_predicted if d.analysis_result else "General Document")
+        category_counts[cat] = category_counts.get(cat, 0) + 1
+        
     return templates.TemplateResponse(request=request, name="user/dashboard.html", context={
         "request": request,
         "user": user,
         "is_admin": False,
         "active_page": "dashboard",
         "stats": stats,
+        "category_counts": category_counts,
         "recent_docs": docs[:8]
     })
 
@@ -208,9 +216,9 @@ def admin_dashboard(request: Request, user: User = Depends(get_current_user_opti
         return RedirectResponse(url="/login")
         
     total_users = db.query(User).count()
-    total_docs = db.query(Document).count()
-    comp_docs = db.query(Document).filter(Document.status == "completed").count()
-    fail_docs = db.query(Document).filter(Document.status == "failed").count()
+    total_docs = db.query(Document).filter(Document.is_deleted == False).count()
+    comp_docs = db.query(Document).filter(Document.status == "completed", Document.is_deleted == False).count()
+    fail_docs = db.query(Document).filter(Document.status == "failed", Document.is_deleted == False).count()
     act_jobs = db.query(ProcessingJob).filter(ProcessingJob.status.in_(["QUEUED", "RUNNING"])).count()
     
     stats = {
@@ -247,7 +255,7 @@ def admin_users(request: Request, user: User = Depends(get_current_user_optional
 def admin_documents(request: Request, user: User = Depends(get_current_user_optional), db: Session = Depends(get_db)):
     if not user or user.role != "admin":
         return RedirectResponse(url="/login")
-    docs = db.query(Document).order_by(Document.created_at.desc()).all()
+    docs = db.query(Document).filter(Document.is_deleted == False).order_by(Document.created_at.desc()).all()
     return templates.TemplateResponse(request=request, name="admin/documents.html", context={
         "request": request,
         "user": user,

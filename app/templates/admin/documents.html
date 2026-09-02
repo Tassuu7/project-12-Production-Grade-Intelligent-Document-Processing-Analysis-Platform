@@ -3,9 +3,10 @@
 {% block content %}
 <div class="page-header">
     <div>
-        <h1 class="page-title">Global Document Explorer</h1>
-        <p class="page-subtitle">System-wide documents uploaded across all user accounts.</p>
+        <h1 class="page-title">Global Document Explorer & Management</h1>
+        <p class="page-subtitle">Inspect, edit classification, or delete documents across all user accounts.</p>
     </div>
+    <a href="/admin/search" class="btn btn-secondary">Search All Documents</a>
 </div>
 <div class="card">
     <div class="table-responsive">
@@ -14,23 +15,47 @@
                 <tr>
                     <th>ID</th>
                     <th>Owner</th>
-                    <th>Title</th>
-                    <th>Type</th>
+                    <th>Document Title</th>
+                    <th>Format</th>
                     <th>Category</th>
                     <th>Status</th>
-                    <th>Latency</th>
+                    <th>Uploaded</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for doc in documents %}
-                <tr>
+                <tr id="doc-row-{{ doc.id }}">
                     <td>{{ doc.id }}</td>
-                    <td>{{ doc.owner.username }}</td>
-                    <td><strong><a href="/documents/{{ doc.id }}">{{ doc.title }}</a></strong></td>
-                    <td>{{ doc.file_type | upper }}</td>
-                    <td>{{ doc.analysis_result.category_predicted if doc.analysis_result else '-' }}</td>
+                    <td>
+                        <strong>{{ doc.owner.username if doc.owner else 'User' }}</strong>
+                        <div style="font-size: 0.75rem; color: var(--slate-400);">{{ doc.owner.email if doc.owner else '' }}</div>
+                    </td>
+                    <td>
+                        <strong><a href="/documents/{{ doc.id }}" style="color: #1e40af; text-decoration: none;">{{ doc.title }}</a></strong>
+                        <div style="font-size: 0.8rem; color: var(--slate-400);">{{ doc.original_filename }} ({{ (doc.file_size_bytes / 1024)|round(1) }} KB)</div>
+                    </td>
+                    <td><span class="badge" style="background: var(--slate-100);">{{ doc.file_type | upper }}</span></td>
+                    <td>
+                        <span class="badge" style="background: #eff6ff; color: #1e40af; font-weight: 600;">
+                            {{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else 'General Document') }}
+                        </span>
+                    </td>
                     <td><span class="badge badge-{{ doc.status }}">{{ doc.status }}</span></td>
-                    <td>{{ doc.processing_duration_ms | round(1) }} ms</td>
+                    <td class="local-timestamp" data-utc="{{ doc.created_at.isoformat() if doc.created_at else '' }}">{{ doc.created_at.strftime('%Y-%m-%d %I:%M %p') if doc.created_at else 'Just now' }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.35rem;">
+                            <a href="/documents/{{ doc.id }}" class="btn btn-sm btn-secondary">Inspect</a>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="openEditModal({{ doc.id }}, '{{ doc.title }}', '{{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else "") }}')">Edit</button>
+                            <button type="button" class="btn btn-sm btn-secondary" style="color: #dc2626; border-color: #fecaca;" onclick="deleteDocument({{ doc.id }}, '{{ doc.title }}')">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 3rem; color: var(--slate-500);">
+                        No documents stored in enterprise repository.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

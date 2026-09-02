@@ -1,5 +1,6 @@
-"""Document Upload, Details, Download, Reprocess, and Delete Endpoints."""
-from typing import List
+"""Document Upload, Details, Download, Reprocess, Edit, and Delete Endpoints."""
+from typing import List, Optional
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, UploadFile, File, Response, Query
 from fastapi.responses import Response as RawResponse
 from sqlalchemy.orm import Session
@@ -16,6 +17,10 @@ from app.services.audit_service import AuditService
 from app.services.queue.job_queue import job_queue
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
+
+class DocumentUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    category: Optional[str] = None
 
 @router.post("/upload", response_model=List[DocumentResponse])
 async def upload_documents(
@@ -80,11 +85,32 @@ async def upload_documents(
 
 @router.get("/", response_model=List[DocumentResponse])
 def list_documents(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return db.query(Document).filter(Document.user_id == user.id, Document.is_deleted == False).all()
+    if user.role == "admin":
+        return db.query(Document).filter(Document.is_deleted == False).order_by(Document.created_at.desc()).all()
+    return db.query(Document).filter(Document.user_id == user.id, Document.is_deleted == False).order_by(Document.created_at.desc()).all()
 
 @router.get("/{document_id}", response_model=DocumentResponse)
 def get_document(document_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     return DocumentService.get_user_document(db, document_id, user.id, is_admin=(user.role == "admin"))
+
+@router.put("/{document_id}")
+def update_document(
+    document_id: int,
+    req: DocumentUpdateRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    doc = DocumentService.update_document(db, document_id, req.title, req.category, user.id, is_admin=(user.role == "admin"))
+    AuditService.log_event(db, "DOCUMENT_EDIT", "DOCUMENT", user_id=user.id, resource_id=str(document_id))
+    return {"success": True, "message": "Document updated successfully.", "document": DocumentResponse.model_validate(doc)}
+
+@router.delete("/{document_id}")
+def delete_document(document_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    doc = DocumentService.get_user_document(db, document_id, user.id, is_admin=(user.role == "admin"))
+    doc_title = doc.title
+    DocumentService.delete_document(db, document_id, user.id, is_admin=(user.role == "admin"))
+    AuditService.log_event(db, "DOCUMENT_DELETE", "DOCUMENT", user_id=user.id, resource_id=str(document_id), details={"title": doc_title})
+    return {"success": True, "message": f"Document '{doc_title}' deleted successfully."}
 
 @router.get("/{document_id}/download")
 def download_document(document_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
