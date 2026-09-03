@@ -7,53 +7,66 @@
         <p class="page-subtitle">Immutable chronological record of logins, uploads, deletions, and administrative actions.</p>
     </div>
 </div>
+
 <div class="card" style="width: 100%;">
     <div class="table-responsive">
-        <table class="data-table">
+        <table class="data-table" style="width: 100%; table-layout: fixed;">
             <thead>
                 <tr>
-                    <th style="width: 70px;">ID</th>
-                    <th style="width: 240px;">Exact Timestamp</th>
-                    <th style="width: 200px;">Action Event</th>
-                    <th style="width: 220px;">User Account</th>
-                    <th>Target Resource</th>
-                    <th style="width: 130px;">IP Address</th>
-                    <th style="width: 110px;">Severity</th>
+                    <th style="width: 75px; text-align: center;">ID</th>
+                    <th style="width: 220px;">Exact Timestamp</th>
+                    <th style="width: 180px;">Action Event</th>
+                    <th style="width: 200px;">User Account</th>
+                    <th style="width: 160px;">Target Resource</th>
+                    <th style="width: 120px;">IP Address</th>
+                    <th style="width: 95px; text-align: center;">Severity</th>
                 </tr>
             </thead>
             <tbody>
                 {% for log in logs %}
                 <tr>
-                    <td><strong>#{{ log.id }}</strong></td>
+                    <td style="text-align: center;"><strong>#{{ log.id }}</strong></td>
                     <td class="local-timestamp" data-utc="{{ log.created_at.isoformat() if log.created_at else '' }}">
                         {{ log.created_at.strftime('%d %b %Y, %I:%M:%S %p') if log.created_at else 'Just now' }}
                     </td>
                     <td>
                         {% if log.action == 'USER_LOGIN' %}
-                        <span class="badge" style="background: #fff7ed; color: #c2410c; font-weight: 700; border: 1px solid #fed7aa;">🔑 User Login</span>
+                        <span class="badge" style="background: #fff7ed; color: #c2410c; font-weight: 700; border: 1px solid #fed7aa; display: inline-flex; align-items: center; gap: 4px;">🔑 User Login</span>
                         {% elif log.action == 'USER_LOGOUT' %}
-                        <span class="badge" style="background: #f4f4f5; color: #52525b; font-weight: 700; border: 1px solid #e4e4e7;">🚪 User Logout</span>
+                        <span class="badge" style="background: #f4f4f5; color: #52525b; font-weight: 700; border: 1px solid #e4e4e7; display: inline-flex; align-items: center; gap: 4px;">🚪 User Logout</span>
                         {% elif log.action == 'USER_REGISTER' %}
-                        <span class="badge" style="background: #ecfdf5; color: #065f46; font-weight: 700; border: 1px solid #a7f3d0;">👤 Account Created</span>
+                        <span class="badge" style="background: #ecfdf5; color: #065f46; font-weight: 700; border: 1px solid #a7f3d0; display: inline-flex; align-items: center; gap: 4px;">👤 Account Created</span>
                         {% elif log.action == 'DOCUMENT_UPLOAD' %}
-                        <span class="badge" style="background: #fff7ed; color: #ea580c; font-weight: 700; border: 1px solid #fed7aa;">📄 Document Upload</span>
+                        <span class="badge" style="background: #fff7ed; color: #ea580c; font-weight: 700; border: 1px solid #fed7aa; display: inline-flex; align-items: center; gap: 4px;">📄 Document Upload</span>
                         {% elif log.action == 'DOCUMENT_DELETE' %}
-                        <span class="badge" style="background: #fef2f2; color: #dc2626; font-weight: 700; border: 1px solid #fecaca;">🗑️ Document Deleted</span>
+                        <span class="badge" style="background: #fef2f2; color: #dc2626; font-weight: 700; border: 1px solid #fecaca; display: inline-flex; align-items: center; gap: 4px;">🗑️ Document Deleted</span>
+                        {% elif log.action == 'DOCUMENT_EDIT' %}
+                        <span class="badge" style="background: #fffbeb; color: #b45309; font-weight: 700; border: 1px solid #fde68a; display: inline-flex; align-items: center; gap: 4px;">✏️ Document Edited</span>
+                        {% elif log.action == 'DOCUMENT_DOWNLOAD' %}
+                        <span class="badge" style="background: #eef2ff; color: #4338ca; font-weight: 700; border: 1px solid #c7d2fe; display: inline-flex; align-items: center; gap: 4px;">📥 Document Download</span>
                         {% elif log.action == 'DOCUMENT_REPROCESS' %}
-                        <span class="badge" style="background: #fff7ed; color: #d97706; font-weight: 700; border: 1px solid #fde68a;">⚡ Reprocessed</span>
+                        <span class="badge" style="background: #fff7ed; color: #d97706; font-weight: 700; border: 1px solid #fde68a; display: inline-flex; align-items: center; gap: 4px;">⚡ Reprocessed</span>
                         {% else %}
-                        <span class="badge badge-completed">{{ log.action }}</span>
+                        <span class="badge badge-completed">{{ log.action.replace('_', ' ').title() }}</span>
                         {% endif %}
                     </td>
                     <td>
                         <strong>{{ log.user.username if log.user else 'System' }}</strong>
                         {% if log.user %}
-                        <div style="font-size: 0.75rem; color: var(--slate-400);">{{ log.user.email }}</div>
+                        <div style="font-size: 0.75rem; color: var(--slate-400); word-break: break-all;">{{ log.user.email }}</div>
                         {% endif %}
                     </td>
-                    <td><code style="background: #f4f4f5; padding: 2px 6px; border-radius: 4px;">{{ log.resource_type }} ({{ log.resource_id or '-' }})</code></td>
+                    <td>
+                        {% if log.resource_type == 'AUTH' %}
+                        <span style="font-size: 0.85rem; color: var(--slate-600); font-weight: 500;">Auth Session</span>
+                        {% elif log.resource_type == 'DOCUMENT' %}
+                        <span style="font-size: 0.85rem; color: #c2410c; font-weight: 600;">Doc #{{ log.resource_id or '-' }}</span>
+                        {% else %}
+                        <code style="background: #f4f4f5; padding: 2px 6px; border-radius: 4px;">{{ log.resource_type }} ({{ log.resource_id or '-' }})</code>
+                        {% endif %}
+                    </td>
                     <td><span style="font-family: monospace; font-size: 0.85rem; color: var(--slate-600);">{{ log.ip_address or '127.0.0.1' }}</span></td>
-                    <td><span class="badge badge-completed">{{ log.severity }}</span></td>
+                    <td style="text-align: center;"><span class="badge badge-completed">{{ log.severity }}</span></td>
                 </tr>
                 {% else %}
                 <tr>
