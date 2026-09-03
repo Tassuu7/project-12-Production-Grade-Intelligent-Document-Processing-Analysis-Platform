@@ -49,7 +49,7 @@ def run_git_audit() -> Dict[str, Any]:
         if res.returncode == 0:
             audit["commit_count"] = int(res.stdout.strip())
 
-        res = subprocess.run(["git", "log", "--oneline", "-n", "30"], capture_output=True, text=True, cwd=PROJECT_ROOT)
+        res = subprocess.run(["git", "log", "--oneline", "-n", "200"], capture_output=True, text=True, cwd=PROJECT_ROOT)
         if res.returncode == 0:
             audit["commits"] = res.stdout.strip().splitlines()
             for line in audit["commits"]:

@@ -15,7 +15,7 @@ from app.core.database import get_db, init_db
 from app.core.logging_config import setup_logging
 from app.core.middleware import ProcessTimerAndSecurityMiddleware
 from app.api.v1 import api_v1_router
-from app.api.dependencies import get_current_user_optional, get_current_admin
+from app.api.dependencies import get_current_user_optional, get_current_admin, get_current_admin_optional
 from app.services.queue.worker import worker_pool
 from app.models.user import User
 from app.models.document import Document
@@ -256,14 +256,16 @@ def reports_page(request: Request, user: User = Depends(get_current_user_optiona
 # ==================== ADMIN PORTAL ROUTES ====================
 
 @app.get("/admin/dashboard", response_class=HTMLResponse)
-def admin_dashboard(request: Request, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+def admin_dashboard(request: Request, admin: Optional[User] = Depends(get_current_admin_optional), db: Session = Depends(get_db)):
+    if not admin:
+        return RedirectResponse(url="/login?switch=true&role=admin", status_code=303)
+        
     total_users = db.query(User).count()
     total_docs = db.query(Document).filter(Document.is_deleted == False).count()
     total_jobs = db.query(ProcessingJob).count()
     recent_jobs = db.query(ProcessingJob).order_by(ProcessingJob.created_at.desc()).limit(10).all()
     recent_audit = db.query(AuditLog).order_by(AuditLog.created_at.desc()).limit(10).all()
     
-    # Calculate real dynamic category breakdown for admin
     all_docs = db.query(Document).filter(Document.is_deleted == False).all()
     category_counts = {}
     for d in all_docs:
@@ -290,7 +292,9 @@ def admin_dashboard(request: Request, admin: User = Depends(get_current_admin), 
     })
 
 @app.get("/admin/users", response_class=HTMLResponse)
-def admin_users(request: Request, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+def admin_users(request: Request, admin: Optional[User] = Depends(get_current_admin_optional), db: Session = Depends(get_db)):
+    if not admin:
+        return RedirectResponse(url="/login?switch=true&role=admin", status_code=303)
     users = db.query(User).order_by(User.created_at.desc()).all()
     return templates.TemplateResponse(request=request, name="admin/users.html", context={
         "request": request,
@@ -301,7 +305,9 @@ def admin_users(request: Request, admin: User = Depends(get_current_admin), db: 
     })
 
 @app.get("/admin/documents", response_class=HTMLResponse)
-def admin_documents(request: Request, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+def admin_documents(request: Request, admin: Optional[User] = Depends(get_current_admin_optional), db: Session = Depends(get_db)):
+    if not admin:
+        return RedirectResponse(url="/login?switch=true&role=admin", status_code=303)
     docs = db.query(Document).filter(Document.is_deleted == False).order_by(Document.created_at.desc()).all()
     return templates.TemplateResponse(request=request, name="admin/documents.html", context={
         "request": request,
@@ -312,7 +318,9 @@ def admin_documents(request: Request, admin: User = Depends(get_current_admin), 
     })
 
 @app.get("/admin/search", response_class=HTMLResponse)
-def admin_search(request: Request, q: str = "", admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+def admin_search(request: Request, q: str = "", admin: Optional[User] = Depends(get_current_admin_optional), db: Session = Depends(get_db)):
+    if not admin:
+        return RedirectResponse(url="/login?switch=true&role=admin", status_code=303)
     results = []
     if q.strip():
         search_res = SearchService.search(db=db, query=q.strip(), user_id=None, is_admin=True, limit=50)
@@ -327,7 +335,9 @@ def admin_search(request: Request, q: str = "", admin: User = Depends(get_curren
     })
 
 @app.get("/admin/jobs", response_class=HTMLResponse)
-def admin_jobs(request: Request, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+def admin_jobs(request: Request, admin: Optional[User] = Depends(get_current_admin_optional), db: Session = Depends(get_db)):
+    if not admin:
+        return RedirectResponse(url="/login?switch=true&role=admin", status_code=303)
     jobs = db.query(ProcessingJob).order_by(ProcessingJob.created_at.desc()).limit(100).all()
     return templates.TemplateResponse(request=request, name="admin/jobs.html", context={
         "request": request,
@@ -338,7 +348,9 @@ def admin_jobs(request: Request, admin: User = Depends(get_current_admin), db: S
     })
 
 @app.get("/admin/audit-logs", response_class=HTMLResponse)
-def admin_audit_logs(request: Request, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+def admin_audit_logs(request: Request, admin: Optional[User] = Depends(get_current_admin_optional), db: Session = Depends(get_db)):
+    if not admin:
+        return RedirectResponse(url="/login?switch=true&role=admin", status_code=303)
     logs = db.query(AuditLog).order_by(AuditLog.created_at.desc()).limit(100).all()
     return templates.TemplateResponse(request=request, name="admin/audit_logs.html", context={
         "request": request,

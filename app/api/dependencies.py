@@ -25,9 +25,8 @@ def get_current_user_optional(
     path = request.url.path
 
     if not auth_token:
-        # Check path-specific cookies first to support simultaneous tabs
         if path.startswith("/admin"):
-            auth_token = request.cookies.get("doc_intel_admin_session") or request.cookies.get("doc_intel_session")
+            auth_token = request.cookies.get("doc_intel_admin_session") or request.cookies.get("doc_intel_session") or request.cookies.get("doc_intel_user_session")
         else:
             auth_token = request.cookies.get("doc_intel_user_session") or request.cookies.get("doc_intel_session") or request.cookies.get("doc_intel_admin_session")
 
@@ -38,9 +37,12 @@ def get_current_user_optional(
     if not payload or not payload.get("sub"):
         return None
 
-    user_id = int(payload["sub"])
-    user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
-    return user
+    try:
+        user_id = int(payload["sub"])
+        user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
+        return user
+    except Exception:
+        return None
 
 def get_current_user(user: Optional[User] = Depends(get_current_user_optional)) -> User:
     if not user:
@@ -50,21 +52,42 @@ def get_current_user(user: Optional[User] = Depends(get_current_user_optional)) 
         )
     return user
 
+def get_current_admin_optional(
+    request: Request,
+    token: Optional[str] = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    """Resolves administrator user or returns None without throwing 403."""
+    auth_token = token or request.cookies.get("doc_intel_admin_session") or request.cookies.get("doc_intel_session")
+    if not auth_token:
+        # Fallback to general user session if user is admin
+        auth_token = request.cookies.get("doc_intel_user_session")
+
+    if not auth_token:
+        return None
+
+    payload = decode_token(auth_token)
+    if not payload or not payload.get("sub"):
+        return None
+
+    try:
+        user_id = int(payload["sub"])
+        user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
+        if user and user.role == UserRole.ADMIN.value:
+            return user
+        return None
+    except Exception:
+        return None
+
 def get_current_admin(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ) -> User:
-    auth_token = token or request.cookies.get("doc_intel_admin_session") or request.cookies.get("doc_intel_session")
-    if not auth_token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Admin authentication required.")
-    
-    payload = decode_token(auth_token)
-    if not payload or not payload.get("sub"):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token.")
-    
-    user_id = int(payload["sub"])
-    user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
-    if not user or user.role != UserRole.ADMIN.value:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Administrative privileges required.")
-    return user
+    admin = get_current_admin_optional(request, token, db)
+    if not admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrative privileges required."
+        )
+    return admin
