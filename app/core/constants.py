@@ -92,6 +92,12 @@ MIME_TYPE_MAP: Dict[str, str] = {
     "txt": "text/plain",
     "csv": "text/csv",
     "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "wps": "application/kswps",
+    "odt": "application/vnd.oasis.opendocument.text",
+    "rtf": "application/rtf",
+    "doc": "application/msword",
+    "json": "application/json",
+    "xml": "application/xml",
 }
 
 MAGIC_SIGNATURES: Dict[str, List[bytes]] = {
@@ -103,7 +109,7 @@ MAGIC_SIGNATURES: Dict[str, List[bytes]] = {
 }
 
 MAX_UPLOAD_SIZE_BYTES: int = 50 * 1024 * 1024
-ALLOWED_FILE_EXTENSIONS: Set[str] = {"pdf", "docx", "txt", "csv", "xlsx"}
+ALLOWED_FILE_EXTENSIONS: Set[str] = {"pdf", "docx", "txt", "csv", "xlsx", "wps", "odt", "rtf", "doc", "json", "xml"}
 
 STOPWORDS: Set[str] = {
     "a", "about", "above", "after", "again", "against", "all", "am", "an", "and",

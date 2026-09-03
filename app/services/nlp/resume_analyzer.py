@@ -203,3 +203,8 @@ class ResumeJobAnalyzer:
 
         matches.sort(key=lambda x: x["match_score"], reverse=True)
         return matches
+
+    @classmethod
+    def analyze_candidate_resume(cls, text: str, filename: str = "") -> Dict[str, Any]:
+        """Convenience classmethod for candidate resume analysis."""
+        return cls().analyze(text, filename)

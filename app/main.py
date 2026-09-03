@@ -152,18 +152,62 @@ def document_detail(document_id: int, request: Request, user: User = Depends(get
         raise HTTPException(status_code=404, detail="Document not found.")
         
     analysis = doc.analysis_result
-    keywords = json.loads(analysis.keywords_json) if analysis and analysis.keywords_json else []
-    topics = json.loads(analysis.topics_json) if analysis and analysis.topics_json else []
-    anomalies = json.loads(analysis.anomaly_findings_json) if analysis and analysis.anomaly_findings_json else []
-    entities = json.loads(analysis.entities_json) if analysis and analysis.entities_json else []
+    keywords = []
+    topics = []
+    anomalies = []
     
-    candidate_profile = None
-    if analysis and analysis.category_predicted == "Resume / CV" and analysis.summary_text:
+    if analysis:
+        try:
+            if analysis.keywords_json:
+                keywords = json.loads(analysis.keywords_json)
+        except Exception:
+            keywords = []
+            
+        try:
+            if analysis.topics_json:
+                topics = json.loads(analysis.topics_json)
+        except Exception:
+            topics = []
+            
+        try:
+            if analysis.anomaly_findings_json:
+                anomalies = json.loads(analysis.anomaly_findings_json)
+        except Exception:
+            anomalies = []
+
+    # Resume & Candidate Intelligence
+    resume_data = None
+    category_name = (doc.category or (analysis.category_predicted if analysis else "") or "").lower()
+    filename_lower = (doc.original_filename or "").lower()
+    
+    if "resume" in category_name or "cv" in category_name or "resume" in filename_lower or "cv" in filename_lower:
         try:
             from app.services.nlp.resume_analyzer import ResumeJobAnalyzer
-            candidate_profile = ResumeJobAnalyzer.analyze_candidate_resume(doc.extracted_text or "")
-        except Exception:
-            candidate_profile = None
+            text_to_analyze = (analysis.extracted_text if analysis and analysis.extracted_text else "") or doc.title
+            resume_data = ResumeJobAnalyzer.analyze_candidate_resume(text_to_analyze)
+        except Exception as e:
+            logger.error(f"Error in resume analyzer: {e}")
+            resume_data = None
+            
+    # Fetch similar documents in user's corpus
+    similar_docs = []
+    try:
+        similarities = db.query(DocumentSimilarity).filter(
+            DocumentSimilarity.source_document_id == doc.id
+        ).order_by(DocumentSimilarity.similarity_score.desc()).limit(5).all()
+        
+        for sim in similarities:
+            target_doc = db.query(Document).filter(Document.id == sim.target_document_id).first()
+            if target_doc:
+                shared = json.loads(sim.shared_terms_json) if sim.shared_terms_json else []
+                similar_docs.append({
+                    "target_id": target_doc.id,
+                    "title": target_doc.title,
+                    "score": sim.similarity_score,
+                    "shared_terms": shared[:4]
+                })
+    except Exception:
+        similar_docs = []
             
     return templates.TemplateResponse(request=request, name="user/document_detail.html", context={
         "request": request,
@@ -173,8 +217,8 @@ def document_detail(document_id: int, request: Request, user: User = Depends(get
         "keywords": keywords,
         "topics": topics,
         "anomalies": anomalies,
-        "entities": entities,
-        "candidate_profile": candidate_profile,
+        "resume_data": resume_data,
+        "similar_docs": similar_docs,
         "active_page": "documents",
         "is_admin": user.role == "admin"
     })

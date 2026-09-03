@@ -20,13 +20,12 @@
             background: #ffffff;
             border: 1px solid #fed7aa;
             border-radius: 6px;
-            padding: 4px 8px;
-            font-size: 0.78rem;
+            padding: 6px 12px;
+            font-size: 0.8rem;
             font-weight: 600;
             color: #c2410c;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 4px;
             display: inline-block;
         }
         .quick-fill-btn:hover {
@@ -74,11 +73,11 @@
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
                     Sign In
                 </button>
-                <div style="margin-top: 1.25rem; background: #fff7ed; border: 1px solid #fed7aa; border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.8rem; color: #9a3412;">
-                    <strong>Fast 1-Click Credentials:</strong>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem;">
-                        <button type="button" class="quick-fill-btn" onclick="fillCreds('admin@test.com', 'Admin@12345')">⚡ Fill Admin</button>
-                        <button type="button" class="quick-fill-btn" onclick="fillCreds('user@test.com', 'User@12345')">⚡ Fill User</button>
+                <div style="margin-top: 1.25rem; background: #fff7ed; border: 1px solid #fed7aa; border-radius: var(--radius-sm); padding: 0.85rem; font-size: 0.82rem; color: #9a3412;">
+                    <strong>Auto-Fill Test Credentials:</strong>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button type="button" class="quick-fill-btn" onclick="fillCreds('admin@test.com', 'Admin@12345')">Admin Account</button>
+                        <button type="button" class="quick-fill-btn" onclick="fillCreds('user@test.com', 'User@12345')">User Account</button>
                     </div>
                 </div>
             </form>

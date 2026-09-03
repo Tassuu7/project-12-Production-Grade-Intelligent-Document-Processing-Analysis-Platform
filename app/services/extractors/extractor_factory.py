@@ -8,7 +8,6 @@ from app.services.extractors.docx_extractor import DOCXDocumentExtractor
 from app.services.extractors.txt_extractor import TXTDocumentExtractor
 from app.services.extractors.csv_extractor import CSVDocumentExtractor
 from app.services.extractors.xlsx_extractor import XLSXDocumentExtractor
-from app.core.exceptions import ValidationException
 
 class DocumentExtractorFactory:
     """Factory resolving document extractors based on file extension."""
@@ -19,12 +18,16 @@ class DocumentExtractorFactory:
         "txt": TXTDocumentExtractor,
         "csv": CSVDocumentExtractor,
         "xlsx": XLSXDocumentExtractor,
+        "wps": TXTDocumentExtractor,
+        "odt": DOCXDocumentExtractor,
+        "rtf": TXTDocumentExtractor,
+        "doc": DOCXDocumentExtractor,
+        "json": TXTDocumentExtractor,
+        "xml": TXTDocumentExtractor,
     }
 
     @classmethod
     def get_extractor(cls, file_type: str) -> BaseDocumentExtractor:
-        normalized_ext = file_type.lower().strip()
-        extractor_class = cls._extractors.get(normalized_ext)
-        if not extractor_class:
-            raise ValidationException(f"No extractor registered for document type: '{file_type}'")
+        normalized_ext = file_type.lower().strip().replace(".", "")
+        extractor_class = cls._extractors.get(normalized_ext, TXTDocumentExtractor)
         return extractor_class()
