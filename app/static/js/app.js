@@ -116,3 +116,87 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
+// Global Document Edit & Delete Helpers
+function openEditModal(docId, currentTitle, currentCategory) {
+    const modal = document.getElementById('edit-doc-modal');
+    if (!modal) return;
+    document.getElementById('edit-doc-id').value = docId;
+    document.getElementById('edit-doc-title').value = currentTitle || '';
+    
+    const catSelect = document.getElementById('edit-doc-category');
+    if (catSelect && currentCategory) {
+        let matched = false;
+        for (let opt of catSelect.options) {
+            if (opt.value.toLowerCase() === currentCategory.toLowerCase() || opt.text.toLowerCase() === currentCategory.toLowerCase()) {
+                opt.selected = true;
+                matched = true;
+                break;
+            }
+        }
+        if (!matched) {
+            const opt = new Option(currentCategory, currentCategory, true, true);
+            catSelect.add(opt);
+        }
+    }
+    modal.style.display = 'flex';
+}
+
+function closeEditModal() {
+    const modal = document.getElementById('edit-doc-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function submitDocumentEdit(e) {
+    e.preventDefault();
+    const docId = document.getElementById('edit-doc-id').value;
+    const title = document.getElementById('edit-doc-title').value.trim();
+    const category = document.getElementById('edit-doc-category').value;
+    const btn = document.getElementById('edit-doc-submit-btn');
+
+    if (!title) {
+        showToast('Document title cannot be empty.', 'error');
+        return;
+    }
+
+    try {
+        btn.disabled = true;
+        btn.innerText = 'Saving...';
+
+        await API.request(`/api/v1/documents/${docId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ title, category })
+        });
+
+        showToast('Document updated successfully!', 'success');
+        closeEditModal();
+        setTimeout(() => window.location.reload(), 600);
+    } catch (err) {
+        showToast(err.message || 'Failed to update document.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Save Changes';
+    }
+}
+
+async function deleteDocument(docId, docTitle) {
+    if (!confirm(`Are you sure you want to delete "${docTitle}"?`)) {
+        return;
+    }
+
+    try {
+        await API.request(`/api/v1/documents/${docId}`, {
+            method: 'DELETE'
+        });
+        showToast(`Document "${docTitle}" deleted.`, 'success');
+        const row = document.getElementById(`doc-row-${docId}`);
+        if (row) {
+            row.remove();
+        } else {
+            setTimeout(() => window.location.reload(), 500);
+        }
+    } catch (err) {
+        showToast(err.message || 'Failed to delete document.', 'error');
+    }
+}
