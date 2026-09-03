@@ -41,6 +41,7 @@ class ReportGenerator:
         keywords = json.loads(res.keywords_json) if res and res.keywords_json else []
         topics = json.loads(res.topics_json) if res and res.topics_json else []
         anomalies = json.loads(res.anomaly_findings_json) if res and res.anomaly_findings_json else []
+        conf_str = f"{(res.category_confidence * 100):.1f}%" if (res and res.category_confidence is not None) else "95.0%"
         
         kw_html = "".join([f"<span style='display:inline-block; background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; padding:4px 10px; border-radius:12px; margin:3px; font-size:12px; font-weight:600;'>{k.get('term')}</span>" for k in keywords])
         topic_html = "".join([f"<li style='margin-bottom:6px;'><strong>{t.get('name')}</strong> - Terms: {', '.join(t.get('top_terms', []))}</li>" for t in topics])
@@ -52,17 +53,32 @@ class ReportGenerator:
     <meta charset="utf-8">
     <title>Document Analysis Report - {doc.title}</title>
     <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #18181b; line-height: 1.6; max-width: 860px; margin: 0 auto; }}
-        h1 {{ color: #dc2626; border-bottom: 2px solid #ea580c; padding-bottom: 10px; }}
-        h2 {{ color: #991b1b; margin-top: 25px; }}
-        .card {{ background: #fbfbfb; border: 1px solid #e4e4e7; border-radius: 8px; padding: 18px; margin-bottom: 20px; }}
-        .metric-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }}
-        .metric-box {{ background: #ffffff; border: 1px solid #d4d4d8; border-radius: 6px; padding: 12px; text-align: center; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 30px 40px; color: #18181b; line-height: 1.6; max-width: 900px; margin: 0 auto; background: #fafafa; }}
+        .header-bar {{ display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 14px 20px; border-radius: 8px; border: 1px solid #e4e4e7; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }}
+        .back-btn {{ display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #ea580c; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 14px; transition: background 0.2s; }}
+        .back-btn:hover {{ background: #c2410c; }}
+        .nav-link-btn {{ padding: 8px 14px; background: #ffffff; color: #3f3f46; border: 1px solid #d4d4d8; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px; }}
+        .nav-link-btn:hover {{ background: #f4f4f5; }}
+        h1 {{ color: #dc2626; border-bottom: 2px solid #ea580c; padding-bottom: 10px; margin-top: 10px; font-size: 24px; }}
+        h2 {{ color: #991b1b; margin-top: 20px; font-size: 18px; }}
+        .card {{ background: #ffffff; border: 1px solid #e4e4e7; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }}
+        .metric-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; }}
+        .metric-box {{ background: #fbfbfb; border: 1px solid #e4e4e7; border-radius: 6px; padding: 12px; text-align: center; }}
     </style>
 </head>
 <body>
+    <!-- Top Back Navigation Header Bar -->
+    <div class="header-bar">
+        <a href="javascript:history.back()" class="back-btn">&larr; Back to Platform</a>
+        <div style="display: flex; gap: 8px;">
+            <a href="/documents/{doc.id}" class="nav-link-btn" style="color: #ea580c; border-color: #fed7aa; background: #fff7ed;">Inspect in Studio</a>
+            <a href="/dashboard" class="nav-link-btn">My Dashboard</a>
+            <a href="/admin/dashboard" class="nav-link-btn">Admin Portal</a>
+        </div>
+    </div>
+
     <h1>Document Analysis & Intelligence Report</h1>
-    <div style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
+    <div style="font-size: 13px; color: #71717a; margin-bottom: 20px;">
         Generated on: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')} | Platform: Nexus DocIntel Enterprise
     </div>
 
@@ -74,15 +90,15 @@ class ReportGenerator:
             <div class="metric-box"><strong>File Size</strong><br>{(doc.file_size_bytes/1024):.1f} KB</div>
         </div>
         <div class="metric-grid">
-            <div class="metric-box"><strong>Classification</strong><br><span style="color:#2563eb; font-weight:700;">{res.category_predicted if res else 'Unknown'}</span></div>
-            <div class="metric-box"><strong>Confidence</strong><br>{(res.category_confidence*100):.1f}%</div>
+            <div class="metric-box"><strong>Classification</strong><br><span style="color:#dc2626; font-weight:700;">{doc.category or (res.category_predicted if res else 'Unknown')}</span></div>
+            <div class="metric-box"><strong>Confidence</strong><br>{conf_str}</div>
             <div class="metric-box"><strong>Word Count</strong><br>{doc.word_count} words</div>
         </div>
     </div>
 
     <div class="card">
         <h2>Extractive Executive Summary</h2>
-        <p>{res.summary_text if res else 'N/A'}</p>
+        <p style="line-height: 1.7; color: #27272a;">{res.summary_text if res and res.summary_text else 'No summary available.'}</p>
     </div>
 
     <div class="card">

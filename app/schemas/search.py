@@ -23,6 +23,7 @@ class SearchResultItem(BaseModel):
     match_type: str  # content, keyword, title, topic
     relevance_score: float
     created_at: str
+    user_id: Optional[int] = None
 
 class SearchFacet(BaseModel):
     value: str

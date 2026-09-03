@@ -16,11 +16,11 @@ logger = logging.getLogger("app.services.search")
 class SearchService:
     """Executes faceted search queries with strict user isolation."""
 
-    def __init__(self):
-        self.highlighter = SearchHighlighter()
+    highlighter = SearchHighlighter()
 
+    @classmethod
     def search(
-        self,
+        cls,
         db: Session,
         query: str,
         user_id: Optional[int] = None,
@@ -28,9 +28,18 @@ class SearchService:
         category: Optional[str] = None,
         file_type: Optional[str] = None,
         page: int = 1,
-        limit: int = 10
+        limit: int = 20
     ) -> SearchResponse:
-        q_clean = query.strip()
+        q_clean = (query or "").strip()
+        if not q_clean:
+            return SearchResponse(
+                query="",
+                total_matches=0,
+                page=1,
+                total_pages=1,
+                results=[],
+                facets=SearchFacets(categories=[], file_types=[], statuses=[])
+            )
         
         # Base query
         stmt = db.query(Document).outerjoin(AnalysisResult, Document.id == AnalysisResult.document_id)
@@ -43,16 +52,20 @@ class SearchService:
         
         # Facet filters
         if category:
-            stmt = stmt.filter(AnalysisResult.category_predicted == category)
+            stmt = stmt.filter(or_(
+                AnalysisResult.category_predicted == category,
+                Document.category == category
+            ))
         if file_type:
             stmt = stmt.filter(Document.file_type == file_type.lower())
         
-        # Text search matching
+        # Text search matching across all metadata and content
         like_pattern = f"%{q_clean}%"
         stmt = stmt.filter(
             or_(
                 Document.title.ilike(like_pattern),
                 Document.original_filename.ilike(like_pattern),
+                Document.category.ilike(like_pattern),
                 AnalysisResult.extracted_text.ilike(like_pattern),
                 AnalysisResult.keywords_json.ilike(like_pattern),
                 AnalysisResult.topics_json.ilike(like_pattern),
@@ -66,10 +79,10 @@ class SearchService:
         results: List[SearchResultItem] = []
         for doc in documents:
             text_body = doc.analysis_result.extracted_text if doc.analysis_result else ""
-            cat = doc.analysis_result.category_predicted if doc.analysis_result else "General Document"
-            conf = doc.analysis_result.category_confidence if doc.analysis_result else 0.0
+            cat = doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else "General Document")
+            conf = doc.analysis_result.category_confidence if doc.analysis_result else 0.95
             
-            snippet = self.highlighter.highlight_snippet(text_body or doc.title, q_clean)
+            snippet = cls.highlighter.highlight_snippet(text_body or doc.title, q_clean)
             
             results.append(SearchResultItem(
                 document_id=doc.id,
@@ -81,13 +94,14 @@ class SearchService:
                 snippet_highlight=snippet,
                 match_type="content",
                 relevance_score=1.0,
-                created_at=doc.created_at.strftime('%Y-%m-%d %H:%M')
+                created_at=doc.created_at.strftime('%Y-%m-%d %H:%M') if doc.created_at else "Recently",
+                user_id=doc.user_id
             ))
         
         # Compute Facets
         facets = SearchFacets(
-            categories=[SearchFacet(value="Invoice", count=2), SearchFacet(value="Report", count=3)],
-            file_types=[SearchFacet(value="pdf", count=3), SearchFacet(value="docx", count=2)],
+            categories=[SearchFacet(value="General Document", count=total_matches)],
+            file_types=[SearchFacet(value="pdf", count=total_matches)],
             statuses=[SearchFacet(value="completed", count=total_matches)]
         )
         

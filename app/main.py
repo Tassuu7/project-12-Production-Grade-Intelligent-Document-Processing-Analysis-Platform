@@ -229,8 +229,8 @@ def search_page(request: Request, q: str = "", user: User = Depends(get_current_
         return RedirectResponse(url="/login?switch=true")
     results = []
     if q.strip():
-        search_res = SearchService.search(db, q.strip(), user_id=user.id, limit=30)
-        results = search_res.get("results", [])
+        search_res = SearchService.search(db=db, query=q.strip(), user_id=user.id, is_admin=(user.role == "admin"), limit=30)
+        results = search_res.results
     return templates.TemplateResponse(request=request, name="user/search.html", context={
         "request": request,
         "user": user,
@@ -315,8 +315,8 @@ def admin_documents(request: Request, admin: User = Depends(get_current_admin), 
 def admin_search(request: Request, q: str = "", admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
     results = []
     if q.strip():
-        search_res = SearchService.search(db, q.strip(), user_id=None, limit=50)
-        results = search_res.get("results", [])
+        search_res = SearchService.search(db=db, query=q.strip(), user_id=None, is_admin=True, limit=50)
+        results = search_res.results
     return templates.TemplateResponse(request=request, name="admin/search.html", context={
         "request": request,
         "user": admin,
