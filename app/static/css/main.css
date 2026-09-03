@@ -161,6 +161,9 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-left: 1.25rem;
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--slate-200);
 }
 
 .role-badge {

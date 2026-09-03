@@ -70,7 +70,6 @@
         </nav>
 
         <div class="user-profile-menu">
-            <span class="role-badge {{ 'admin' if is_admin else 'user' }}">{{ 'ADMIN' if is_admin else 'USER' }}</span>
             <span style="font-weight: 600; color: var(--slate-700);">{{ user.full_name if user else 'Account' }}</span>
             <a href="/logout" class="btn btn-sm btn-secondary" onclick="API.logout(); return false;">Logout</a>
         </div>
