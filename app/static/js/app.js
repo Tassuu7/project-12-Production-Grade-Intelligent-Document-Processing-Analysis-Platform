@@ -1,8 +1,20 @@
 /* Core Application Client and Session Management */
 
 const API = {
+    getToken() {
+        // 1. First check tab-isolated sessionStorage
+        const tabToken = sessionStorage.getItem('token');
+        if (tabToken) return tabToken;
+        
+        // 2. Check role-specific localStorage based on current URL path
+        if (window.location.pathname.startsWith('/admin')) {
+            return localStorage.getItem('admin_token') || localStorage.getItem('token');
+        }
+        return localStorage.getItem('user_token') || localStorage.getItem('token');
+    },
+
     async request(url, options = {}) {
-        const token = localStorage.getItem('token');
+        const token = this.getToken();
         const headers = options.headers || {};
         
         if (token) {
@@ -17,9 +29,9 @@ const API = {
             const response = await fetch(url, { ...options, headers });
             
             if (response.status === 401 && !url.includes('/auth/login') && !url.includes('/auth/register')) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                window.location.href = '/login';
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
+                window.location.href = '/login?switch=true';
                 return null;
             }
 
@@ -35,19 +47,28 @@ const API = {
     },
 
     getCurrentUser() {
-        const u = localStorage.getItem('user');
+        const u = sessionStorage.getItem('user') || localStorage.getItem('user');
         return u ? JSON.parse(u) : null;
     },
 
     async logout() {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        
+        if (window.location.pathname.startsWith('/admin')) {
+            localStorage.removeItem('admin_token');
+        } else {
+            localStorage.removeItem('user_token');
+        }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+
         try {
             await fetch('/api/v1/auth/logout', { method: 'POST' });
         } catch (e) {
             console.error('Logout error:', e);
         }
-        window.location.href = '/logout';
+        window.location.href = '/login?switch=true';
     }
 };
 

@@ -41,8 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (res && res.access_token) {
+                    // 1. Tab-isolated session storage (allows different tabs to be logged in as different users)
+                    sessionStorage.setItem('token', res.access_token);
+                    sessionStorage.setItem('user', JSON.stringify(res.user));
+                    
+                    // 2. Role-specific local storage
+                    if (res.user.role === 'admin') {
+                        localStorage.setItem('admin_token', res.access_token);
+                    } else {
+                        localStorage.setItem('user_token', res.access_token);
+                    }
                     localStorage.setItem('token', res.access_token);
                     localStorage.setItem('user', JSON.stringify(res.user));
+
                     showToast('Login successful! Redirecting...', 'success');
                     
                     setTimeout(() => {
@@ -92,6 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (loginRes && loginRes.access_token) {
+                    sessionStorage.setItem('token', loginRes.access_token);
+                    sessionStorage.setItem('user', JSON.stringify(loginRes.user));
+                    localStorage.setItem('user_token', loginRes.access_token);
                     localStorage.setItem('token', loginRes.access_token);
                     localStorage.setItem('user', JSON.stringify(loginRes.user));
                     setTimeout(() => {

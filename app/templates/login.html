@@ -16,6 +16,24 @@
             font-weight: 900;
             letter-spacing: -0.5px;
         }
+        .quick-fill-btn {
+            background: #ffffff;
+            border: 1px solid #fed7aa;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #c2410c;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        .quick-fill-btn:hover {
+            background: #ea580c;
+            color: #ffffff;
+            border-color: #ea580c;
+        }
     </style>
 </head>
 <body>
@@ -24,7 +42,12 @@
             <div class="auth-header">
                 <div style="display: flex; justify-content: center;">
                     <div class="auth-logo-badge">
-                        <svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                        <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; fill: none; stroke: #ffffff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
                     </div>
                 </div>
                 <h1 class="brand-title-gradient">Nexus DocIntel</h1>
@@ -51,10 +74,12 @@
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
                     Sign In
                 </button>
-                <div style="margin-top: 1.5rem; background: #fff7ed; border: 1px solid #fed7aa; border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.8rem; color: #9a3412;">
-                    <strong>Default Credentials:</strong><br>
-                    • Admin: <code>admin@test.com</code> / <code>Admin@12345</code><br>
-                    • User: <code>user@test.com</code> / <code>User@12345</code>
+                <div style="margin-top: 1.25rem; background: #fff7ed; border: 1px solid #fed7aa; border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.8rem; color: #9a3412;">
+                    <strong>Fast 1-Click Credentials:</strong>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem;">
+                        <button type="button" class="quick-fill-btn" onclick="fillCreds('admin@test.com', 'Admin@12345')">⚡ Fill Admin</button>
+                        <button type="button" class="quick-fill-btn" onclick="fillCreds('user@test.com', 'User@12345')">⚡ Fill User</button>
+                    </div>
                 </div>
             </form>
 
@@ -86,5 +111,11 @@
     <div id="toast-container"></div>
     <script src="/static/js/app.js"></script>
     <script src="/static/js/auth.js"></script>
+    <script>
+    function fillCreds(u, p) {
+        document.getElementById('login-username').value = u;
+        document.getElementById('login-password').value = p;
+    }
+    </script>
 </body>
 </html>

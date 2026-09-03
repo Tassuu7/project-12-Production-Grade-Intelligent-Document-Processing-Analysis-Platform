@@ -1,5 +1,5 @@
 """
-FastAPI Authentication Dependencies, Session Guards, and Role Access Verifiers.
+FastAPI Authentication Dependencies, Multi-Portal Session Guards, and Role Access Verifiers.
 """
 from typing import Optional
 from fastapi import Depends, HTTPException, status, Request
@@ -17,18 +17,27 @@ def get_current_user_optional(
     token: Optional[str] = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ) -> Optional[User]:
-    # Check Header or Cookie
+    """
+    Resolves authenticated user from Bearer header or role-specific session cookies.
+    Supports simultaneous multi-tab access for User and Admin portals.
+    """
     auth_token = token
+    path = request.url.path
+
     if not auth_token:
-        auth_token = request.cookies.get("doc_intel_session")
-        
+        # Check path-specific cookies first to support simultaneous tabs
+        if path.startswith("/admin"):
+            auth_token = request.cookies.get("doc_intel_admin_session") or request.cookies.get("doc_intel_session")
+        else:
+            auth_token = request.cookies.get("doc_intel_user_session") or request.cookies.get("doc_intel_session") or request.cookies.get("doc_intel_admin_session")
+
     if not auth_token:
         return None
-        
+
     payload = decode_token(auth_token)
     if not payload or not payload.get("sub"):
         return None
-        
+
     user_id = int(payload["sub"])
     user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
     return user
@@ -41,10 +50,21 @@ def get_current_user(user: Optional[User] = Depends(get_current_user_optional)) 
         )
     return user
 
-def get_current_admin(user: User = Depends(get_current_user)) -> User:
-    if user.role != UserRole.ADMIN.value:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Administrative privileges required."
-        )
+def get_current_admin(
+    request: Request,
+    token: Optional[str] = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> User:
+    auth_token = token or request.cookies.get("doc_intel_admin_session") or request.cookies.get("doc_intel_session")
+    if not auth_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Admin authentication required.")
+    
+    payload = decode_token(auth_token)
+    if not payload or not payload.get("sub"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token.")
+    
+    user_id = int(payload["sub"])
+    user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
+    if not user or user.role != UserRole.ADMIN.value:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Administrative privileges required.")
     return user

@@ -1,6 +1,6 @@
-"""Authentication Endpoints."""
+"""Authentication Endpoints with Dual-Portal Session Support."""
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import verify_password, create_access_token, create_refresh_token
@@ -33,7 +33,7 @@ def login(req: UserLogin, response: Response, db: Session = Depends(get_db)):
     token = create_access_token(user.id, user.role, user.email)
     refresh_token = create_refresh_token(user.id, user.role, user.email)
     
-    # Set secure session cookie
+    # 1. Set general session cookie
     response.set_cookie(
         key="doc_intel_session",
         value=token,
@@ -42,6 +42,26 @@ def login(req: UserLogin, response: Response, db: Session = Depends(get_db)):
         max_age=28800,
         path="/"
     )
+    
+    # 2. Set role-specific session cookie for seamless multi-tab dual portal support
+    if user.role == "admin":
+        response.set_cookie(
+            key="doc_intel_admin_session",
+            value=token,
+            httponly=True,
+            samesite="lax",
+            max_age=28800,
+            path="/"
+        )
+    else:
+        response.set_cookie(
+            key="doc_intel_user_session",
+            value=token,
+            httponly=True,
+            samesite="lax",
+            max_age=28800,
+            path="/"
+        )
     
     AuditService.log_event(db, "USER_LOGIN", "AUTH", user_id=user.id)
     
@@ -52,9 +72,13 @@ def login(req: UserLogin, response: Response, db: Session = Depends(get_db)):
     )
 
 @router.post("/logout")
-def logout(response: Response, user: Optional[User] = Depends(get_current_user_optional), db: Session = Depends(get_db)):
+def logout(request: Request, response: Response, user: Optional[User] = Depends(get_current_user_optional), db: Session = Depends(get_db)):
     if user:
         AuditService.log_event(db, "USER_LOGOUT", "AUTH", user_id=user.id)
+        if user.role == "admin":
+            response.delete_cookie(key="doc_intel_admin_session", path="/")
+        else:
+            response.delete_cookie(key="doc_intel_user_session", path="/")
     response.delete_cookie(key="doc_intel_session", path="/")
     return {"message": "Successfully logged out."}
 
