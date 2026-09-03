@@ -96,8 +96,13 @@ function initUploader(dropzoneId, fileInputId, fileListId, uploadBtnId) {
                 selectedFiles = [];
                 renderFileList();
                 setTimeout(() => {
-                    window.location.href = '/dashboard';
-                }, 1000);
+                    const u = API.getCurrentUser();
+                    if (u && u.role === 'admin') {
+                        window.location.href = '/admin/documents';
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
+                }, 800);
             } catch (err) {
                 showToast(err.message, 'error');
                 uploadBtn.disabled = false;

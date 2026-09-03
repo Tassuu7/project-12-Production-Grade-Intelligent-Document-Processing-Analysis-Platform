@@ -67,13 +67,12 @@ class ReportGenerator:
     </style>
 </head>
 <body>
-    <!-- Top Back Navigation Header Bar -->
+        <!-- Top Back Navigation Header Bar -->
     <div class="header-bar">
-        <a href="javascript:history.back()" class="back-btn">&larr; Back to Platform</a>
+        <a href="/documents/{doc.id}" onclick="if (window.opener || window.history.length > 1) {{ window.history.back(); return false; }}" class="back-btn">&larr; Back to Document</a>
         <div style="display: flex; gap: 8px;">
             <a href="/documents/{doc.id}" class="nav-link-btn" style="color: #ea580c; border-color: #fed7aa; background: #fff7ed;">Inspect in Studio</a>
             <a href="/dashboard" class="nav-link-btn">My Dashboard</a>
-            <a href="/admin/dashboard" class="nav-link-btn">Admin Portal</a>
         </div>
     </div>
 
