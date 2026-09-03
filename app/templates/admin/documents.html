@@ -4,29 +4,29 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">Global Document Explorer & Management</h1>
-        <p class="page-subtitle">Inspect, edit classification, or delete documents across all user accounts.</p>
+        <p class="page-subtitle">Inspect and delete documents uploaded across all user accounts.</p>
     </div>
     <a href="/admin/search" class="btn btn-secondary">Search All Documents</a>
 </div>
-<div class="card">
+<div class="card" style="width: 100%;">
     <div class="table-responsive">
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Owner</th>
-                    <th>Document Title</th>
-                    <th>Format</th>
-                    <th>Category</th>
-                    <th>Status</th>
-                    <th>Uploaded</th>
-                    <th>Actions</th>
+                    <th style="width: 60px;">ID</th>
+                    <th>Document Owner</th>
+                    <th>Document Title & Filename</th>
+                    <th style="width: 100px;">Format</th>
+                    <th>Classification Category</th>
+                    <th style="width: 120px;">Status</th>
+                    <th style="width: 220px;">Uploaded Time</th>
+                    <th style="width: 180px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for doc in documents %}
                 <tr id="doc-row-{{ doc.id }}">
-                    <td>{{ doc.id }}</td>
+                    <td><strong>#{{ doc.id }}</strong></td>
                     <td>
                         <strong>{{ doc.owner.username if doc.owner else 'User' }}</strong>
                         <div style="font-size: 0.75rem; color: var(--slate-400);">{{ doc.owner.email if doc.owner else '' }}</div>
@@ -42,11 +42,12 @@
                         </span>
                     </td>
                     <td><span class="badge badge-{{ doc.status }}">{{ doc.status }}</span></td>
-                    <td class="local-timestamp" data-utc="{{ doc.created_at.isoformat() if doc.created_at else '' }}">{{ doc.created_at.strftime('%Y-%m-%d %I:%M %p') if doc.created_at else 'Just now' }}</td>
+                    <td class="local-timestamp" data-utc="{{ doc.created_at.isoformat() if doc.created_at else '' }}">
+                        {{ doc.created_at.strftime('%d %b %Y, %I:%M:%S %p') if doc.created_at else 'Just now' }}
+                    </td>
                     <td>
                         <div style="display: flex; gap: 0.35rem;">
                             <a href="/documents/{{ doc.id }}" class="btn btn-sm btn-secondary">Inspect</a>
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="openEditModal({{ doc.id }}, '{{ doc.title }}', '{{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else "") }}')">Edit</button>
                             <button type="button" class="btn btn-sm btn-secondary" style="color: #dc2626; border-color: #fecaca;" onclick="deleteDocument({{ doc.id }}, '{{ doc.title }}')">Delete</button>
                         </div>
                     </td>

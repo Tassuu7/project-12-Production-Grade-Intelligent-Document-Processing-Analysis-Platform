@@ -1,4 +1,4 @@
-/* Enterprise Flame Orange & Crimson Red Design System (ZERO BLUE / ZERO PINK) */
+/* Enterprise Flame Orange & Electric Crimson Design System */
 :root {
     --primary-50: #fff7ed;
     --primary-100: #ffedd5;
@@ -45,7 +45,6 @@
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
 
     --header-height: 68px;
-    --sidebar-width: 260px;
     --transition-fast: 150ms ease-in-out;
 }
 
@@ -76,39 +75,26 @@ a:hover {
     color: var(--primary-800);
 }
 
-.app-container {
-    display: flex;
-    min-height: 100vh;
-}
-
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    background-color: var(--slate-50);
-}
-
 .page-body {
-    padding: 2rem;
+    padding: 1.75rem 2rem;
     flex: 1;
-    max-width: 1440px;
-    margin: 0 auto;
     width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.75rem;
     flex-wrap: wrap;
     gap: 1rem;
 }
 
 .page-title {
     font-size: 1.75rem;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--slate-900);
     letter-spacing: -0.02em;
 }
@@ -139,13 +125,6 @@ a:hover {
     gap: 0.75rem;
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--primary-800);
-}
-
-.nav-brand svg {
-    width: 32px;
-    height: 32px;
-    fill: var(--primary-600);
 }
 
 .nav-links {

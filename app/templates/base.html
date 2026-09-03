@@ -17,11 +17,12 @@
             justify-content: center;
             width: 38px;
             height: 38px;
-            border-radius: 10px;
+            border-radius: 8px;
             background: linear-gradient(135deg, #ea580c 0%, #dc2626 50%, #991b1b 100%);
-            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
             color: #ffffff;
             margin-right: 0.75rem;
+            flex-shrink: 0;
         }
         .brand-title-gradient {
             background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 40%, #ea580c 100%);
@@ -38,7 +39,12 @@
     <header class="top-navbar">
         <div class="nav-brand" style="display: flex; align-items: center;">
             <div class="brand-logo-badge">
-                <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: none; stroke: #ffffff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
             </div>
             <span class="brand-title-gradient">Nexus DocIntel</span>
         </div>
@@ -73,75 +79,10 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Global Document Edit Modal -->
-    <div id="edit-doc-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-        <div style="background: white; border-radius: 12px; padding: 2rem; width: 100%; max-width: 480px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
-            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--slate-900); margin-bottom: 1rem;">Edit Document Metadata</h3>
-            <form id="edit-doc-form">
-                <input type="hidden" id="edit-doc-id">
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--slate-700); margin-bottom: 0.35rem;">Document Title</label>
-                    <input type="text" id="edit-doc-title" class="input-field" required style="width: 100%;">
-                </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--slate-700); margin-bottom: 0.35rem;">Classification Category</label>
-                    <select id="edit-doc-category" class="input-field" style="width: 100%;">
-                        <option value="Resume / CV">Resume / CV</option>
-                        <option value="Invoice">Invoice</option>
-                        <option value="Financial Statement">Financial Statement</option>
-                        <option value="Legal Contract">Legal Contract</option>
-                        <option value="Technical Specification">Technical Specification</option>
-                        <option value="Medical / Clinical">Medical / Clinical</option>
-                        <option value="Research Paper">Research Paper</option>
-                        <option value="Spreadsheet">Spreadsheet</option>
-                        <option value="Report">Report</option>
-                        <option value="General Document">General Document</option>
-                    </select>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <div id="toast-container"></div>
     <script src="/static/js/app.js"></script>
     <script src="/static/js/charts.js"></script>
     <script>
-    function openEditModal(id, currentTitle, currentCategory) {
-        document.getElementById('edit-doc-id').value = id;
-        document.getElementById('edit-doc-title').value = currentTitle;
-        if (currentCategory) {
-            document.getElementById('edit-doc-category').value = currentCategory;
-        }
-        const modal = document.getElementById('edit-doc-modal');
-        modal.style.display = 'flex';
-    }
-    
-    function closeEditModal() {
-        document.getElementById('edit-doc-modal').style.display = 'none';
-    }
-
-    document.getElementById('edit-doc-form')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('edit-doc-id').value;
-        const title = document.getElementById('edit-doc-title').value.trim();
-        const category = document.getElementById('edit-doc-category').value;
-        try {
-            await API.request(`/api/v1/documents/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify({ title, category })
-            });
-            showToast('Document updated successfully!', 'success');
-            closeEditModal();
-            setTimeout(() => window.location.reload(), 600);
-        } catch (err) {
-            showToast(err.message, 'error');
-        }
-    });
-
     async function deleteDocument(id, title) {
         if (!confirm(`Are you sure you want to delete '${title}'? This action cannot be undone.`)) {
             return;

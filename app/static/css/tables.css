@@ -1,37 +1,43 @@
-/* Advanced Data Tables, Highlighting, and Tabular Matrices */
-.advanced-matrix-container {
+/* Enterprise Widescreen Table Styles */
+.table-responsive {
     width: 100%;
     overflow-x: auto;
-    border: 1px solid var(--slate-200);
-    border-radius: var(--radius-md);
-    background: #ffffff;
+    -webkit-overflow-scrolling: touch;
 }
 
-.matrix-header-cell {
-    background: var(--slate-50);
-    padding: 0.85rem 1.25rem;
-    font-weight: 700;
-    color: var(--slate-700);
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
     text-align: left;
-    border-bottom: 2px solid var(--slate-200);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-}
-
-.matrix-body-cell {
-    padding: 0.75rem 1.25rem;
-    color: var(--slate-800);
     font-size: 0.9rem;
+}
+
+.data-table th {
+    background: #fbfbfb;
+    color: var(--slate-700);
+    font-weight: 700;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 2px solid var(--slate-200);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 0.9rem 1.25rem;
     border-bottom: 1px solid var(--slate-100);
+    color: var(--slate-800);
+    vertical-align: middle;
 }
 
-.matrix-row:hover {
-    background: var(--slate-50);
+.data-table tbody tr:hover {
+    background: #fff7ed;
 }
 
-.sort-indicator {
-    display: inline-block;
-    margin-left: 0.35rem;
-    color: var(--slate-400);
-    font-size: 0.75rem;
+.local-timestamp {
+    font-variant-numeric: tabular-nums;
+    color: var(--slate-600);
+    font-weight: 500;
+    white-space: nowrap;
 }

@@ -79,18 +79,19 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const date = new Date(utcStr.endsWith('Z') ? utcStr : utcStr + 'Z');
                 if (!isNaN(date.getTime())) {
-                    el.innerText = date.toLocaleString([], {
-                        year: 'numeric',
-                        month: 'short',
+                    const formatted = date.toLocaleDateString('en-GB', {
                         day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    }) + ', ' + date.toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit',
                         second: '2-digit',
                         hour12: true
                     });
+                    el.innerText = formatted;
                 }
             } catch (e) {}
         }
     });
 });
-
