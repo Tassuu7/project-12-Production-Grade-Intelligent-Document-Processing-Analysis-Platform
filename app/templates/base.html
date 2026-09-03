@@ -119,22 +119,7 @@
     <div id="toast-container"></div>
     <script src="/static/js/app.js"></script>
     <script src="/static/js/charts.js"></script>
-    <script>
-    async function deleteDocument(id, title) {
-        if (!confirm(`Are you sure you want to delete '${title}'? This action cannot be undone.`)) {
-            return;
-        }
-        try {
-            await API.request(`/api/v1/documents/${id}`, { method: 'DELETE' });
-            showToast(`Document '${title}' deleted successfully.`, 'success');
-            const row = document.getElementById(`doc-row-${id}`);
-            if (row) row.remove();
-            setTimeout(() => window.location.reload(), 800);
-        } catch (err) {
-            showToast(err.message, 'error');
-        }
-    }
-    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>

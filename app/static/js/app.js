@@ -1,12 +1,10 @@
-/* Core Application Client and Session Management */
+/* Core Application Client, Session Management & Document Actions */
 
 const API = {
     getToken() {
-        // 1. First check tab-isolated sessionStorage
         const tabToken = sessionStorage.getItem('token');
         if (tabToken) return tabToken;
         
-        // 2. Check role-specific localStorage based on current URL path
         if (window.location.pathname.startsWith('/admin')) {
             return localStorage.getItem('admin_token') || localStorage.getItem('token');
         }
@@ -117,25 +115,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Document Edit Modal Handlers
+function openEditModalFromEl(btn) {
+    if (!btn) return;
+    const docId = btn.getAttribute('data-id');
+    const docTitle = btn.getAttribute('data-title');
+    const docCategory = btn.getAttribute('data-category');
+    openEditModal(docId, docTitle, docCategory);
+}
 
-// Global Document Edit & Delete Helpers
 function openEditModal(docId, currentTitle, currentCategory) {
     const modal = document.getElementById('edit-doc-modal');
     if (!modal) return;
-    document.getElementById('edit-doc-id').value = docId;
+    
+    document.getElementById('edit-doc-id').value = docId || '';
     document.getElementById('edit-doc-title').value = currentTitle || '';
     
     const catSelect = document.getElementById('edit-doc-category');
     if (catSelect && currentCategory) {
         let matched = false;
+        const norm = currentCategory.toLowerCase().trim();
         for (let opt of catSelect.options) {
-            if (opt.value.toLowerCase() === currentCategory.toLowerCase() || opt.text.toLowerCase() === currentCategory.toLowerCase()) {
+            if (opt.value.toLowerCase().trim() === norm || opt.text.toLowerCase().trim() === norm) {
                 opt.selected = true;
                 matched = true;
                 break;
             }
         }
-        if (!matched) {
+        if (!matched && currentCategory) {
             const opt = new Option(currentCategory, currentCategory, true, true);
             catSelect.add(opt);
         }
@@ -149,7 +156,7 @@ function closeEditModal() {
 }
 
 async function submitDocumentEdit(e) {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     const docId = document.getElementById('edit-doc-id').value;
     const title = document.getElementById('edit-doc-title').value.trim();
     const category = document.getElementById('edit-doc-category').value;
@@ -161,8 +168,10 @@ async function submitDocumentEdit(e) {
     }
 
     try {
-        btn.disabled = true;
-        btn.innerText = 'Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+        }
 
         await API.request(`/api/v1/documents/${docId}`, {
             method: 'PUT',
@@ -175,13 +184,23 @@ async function submitDocumentEdit(e) {
     } catch (err) {
         showToast(err.message || 'Failed to update document.', 'error');
     } finally {
-        btn.disabled = false;
-        btn.innerText = 'Save Changes';
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = 'Save Changes';
+        }
     }
 }
 
+// Document Delete Handlers
+function deleteDocumentFromEl(btn) {
+    if (!btn) return;
+    const docId = btn.getAttribute('data-id');
+    const docTitle = btn.getAttribute('data-title') || 'this document';
+    deleteDocument(docId, docTitle);
+}
+
 async function deleteDocument(docId, docTitle) {
-    if (!confirm(`Are you sure you want to delete "${docTitle}"?`)) {
+    if (!confirm(`Are you sure you want to delete "${docTitle}"? This action cannot be undone.`)) {
         return;
     }
 
@@ -189,12 +208,18 @@ async function deleteDocument(docId, docTitle) {
         await API.request(`/api/v1/documents/${docId}`, {
             method: 'DELETE'
         });
-        showToast(`Document "${docTitle}" deleted.`, 'success');
+        showToast(`Document "${docTitle}" deleted successfully.`, 'success');
         const row = document.getElementById(`doc-row-${docId}`);
         if (row) {
             row.remove();
         } else {
-            setTimeout(() => window.location.reload(), 500);
+            setTimeout(() => {
+                if (window.location.pathname.startsWith('/documents/')) {
+                    window.location.href = '/documents';
+                } else {
+                    window.location.reload();
+                }
+            }, 600);
         }
     } catch (err) {
         showToast(err.message || 'Failed to delete document.', 'error');

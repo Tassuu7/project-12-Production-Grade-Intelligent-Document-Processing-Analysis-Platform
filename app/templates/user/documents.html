@@ -47,8 +47,8 @@
                     <td>
                         <div style="display: flex; gap: 0.35rem;">
                             <a href="/documents/{{ doc.id }}" class="btn btn-sm btn-secondary">Inspect</a>
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="openEditModal({{ doc.id }}, '{{ doc.title }}', '{{ doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else "") }}')">Edit</button>
-                            <button type="button" class="btn btn-sm btn-secondary" style="color: #dc2626; border-color: #fecaca;" onclick="deleteDocument({{ doc.id }}, '{{ doc.title }}')">Delete</button>
+                            <button type="button" class="btn btn-sm btn-secondary" data-id="{{ doc.id }}" data-title="{{ doc.title | e }}" data-category="{{ (doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else 'General')) | e }}" onclick="openEditModalFromEl(this)">Edit</button>
+                            <button type="button" class="btn btn-sm btn-secondary" style="color: #dc2626; border-color: #fecaca;" data-id="{{ doc.id }}" data-title="{{ doc.title | e }}" onclick="deleteDocumentFromEl(this)">Delete</button>
                         </div>
                     </td>
                 </tr>

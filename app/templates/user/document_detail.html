@@ -9,10 +9,12 @@
         <h1 class="page-title">{{ doc.title }}</h1>
         <p class="page-subtitle">File: <code>{{ doc.original_filename }}</code> | Format: <span class="badge badge-completed">{{ doc.file_type.upper() }}</span> | Size: {{ (doc.file_size_bytes / 1024)|round(1) }} KB</p>
     </div>
-    <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <button type="button" class="btn btn-sm btn-primary" data-id="{{ doc.id }}" data-title="{{ doc.title | e }}" data-category="{{ (doc.category or (doc.analysis_result.category_predicted if doc.analysis_result else 'General')) | e }}" onclick="openEditModalFromEl(this)">Edit Document</button>
         <a href="/api/v1/reports/document/{{ doc.id }}?format=pdf" class="btn btn-sm btn-secondary">Export PDF</a>
         <a href="/api/v1/reports/document/{{ doc.id }}?format=html" target="_blank" class="btn btn-sm btn-secondary">Standalone HTML</a>
         <a href="/api/v1/reports/document/{{ doc.id }}?format=json" class="btn btn-sm btn-secondary">Export JSON</a>
+        <button type="button" class="btn btn-sm btn-secondary" style="color: #dc2626; border-color: #fecaca;" data-id="{{ doc.id }}" data-title="{{ doc.title | e }}" onclick="deleteDocumentFromEl(this)">Delete</button>
     </div>
 </div>
 
